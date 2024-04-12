@@ -1,0 +1,62 @@
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+// import Layout from '../components/HelloWorld.vue'
+
+const routes: Array<RouteRecordRaw> = [
+  {
+  //路由初始指向
+    path: '/',
+    name: 'Index',
+    component:()=>import('../index/Index.vue'),
+  },
+  {
+    //路由初始指向
+      path: '/main',
+      component:()=>import('../pages/Index.vue'),
+      children:[
+        {
+        //路由初始指向
+          path: 'Json',
+          name: 'Json',
+          meta: {
+            title: 'JSON'
+          },
+          component:()=>import('../pages/Json.vue'),
+        },
+        {
+          //路由初始指向
+            path: 'Merge',
+            name: 'Merge',
+            meta: {
+              title: 'Merge'
+            },
+            component:()=>import('../pages/Merge.vue'),
+          }
+          ,
+        {
+          //路由初始指向
+            path: 'Img',
+            name: 'Img',
+            meta: {
+              title: 'Img'
+            },
+            component:()=>import('../pages/Img.vue'),
+          }
+        ,
+        {
+          path: '/:catchAll(.*)',
+          name: 'default',
+          meta: {
+            title: 'default'
+          },
+          component:()=>import('../pages/default.vue'),
+        }
+      ]
+    }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+export default router

@@ -1,0 +1,56 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-capability",
+  "description": "Capability for the main window",
+  "windows": [
+    "main",
+    "dev-*"
+  ],
+  "remote": {
+    "urls": [
+      "https://**"
+    ]
+  },
+  "permissions": [
+    "path:default",
+    "event:default",
+    "window:default",
+    "window:allow-start-dragging",
+    "window:allow-minimize",
+    "window:allow-maximize",
+    "window:allow-toggle-maximize",
+    "window:allow-close",
+    "window:allow-create",
+    "window:allow-set-title",
+    "window:allow-available-monitors",
+    "app:default",
+    "resources:default",
+    "menu:default",
+    "tray:default",
+    "webview:allow-create-webview-window",
+    "webview:allow-create-webview",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-message",
+    "dialog:allow-ask",
+    "fs:allow-write-text-file",
+    "fs:allow-read-text-file",
+    "fs:allow-exists",
+    "fs:allow-create",
+    {
+      "identifier": "fs:scope-appdata",
+      "allow": [
+        {
+          "path": "$TEMPLATE/**"
+        }
+      ],
+      "deny": [
+        {
+          "path": "$TEMPLATE/*.stronghold"
+        }
+      ]
+    },
+    "fs:default",
+    "dialog:default"
+  ]
+}
