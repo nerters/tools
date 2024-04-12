@@ -1,7 +1,7 @@
 <template>
     <el-upload
+      ref="uploadRef"
       class="avatar-uploader"
-
       :show-file-list="false"
       :on-success="handleAvatarSuccess"
       :before-upload="beforeAvatarUpload"
@@ -19,6 +19,10 @@
   import type { UploadProps } from 'element-plus'
   
   const imageUrl = ref('')
+
+  const uploadRef = ref()
+
+  uploadRef.value.$el.click()
   
   const handleAvatarSuccess: UploadProps['onSuccess'] = (
     response,
