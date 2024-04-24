@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transparent Window</title>
+  <style>
+    /* 设置 body 元素的背景颜色为透明 */
+    body {
+      background-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 设置窗口的大小和位置 */
+    .transparent-window {
+      width: 400px;
+      height: 200px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.5);
+       /* 设置背景颜色为半透明白色 */
+      border-radius: 10px; /* 设置圆角 */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 设置阴影 */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="transparent-window" onclick="close()" style="overflow-x:hidden; overflow-y:hidden; height: 100%;" >
+    <div class="content">
+      <p id="title"></p>
+      
+    </div>
+  </div>
+</body>
+
+<script >
+    import { getCurrent } from '@tauri-apps/api/window';
+    import { invoke } from '@tauri-apps/api/core';
+
+    const appWindow = getCurrent();
+
+    let tit = await appWindow.title();
+    let split = tit.split("_+||+_");
+
+
+    document.getElementById("title").innerText = split[0];
+
+    let cronId = split[1]
+
+    async function close() {
+      console.log(3);
+      appWindow.close()
+      await invoke("use_cron", {id: cronId});
+      appWindow.emit("ref_cron_list", true);
+  }
+
+
+
+</script>
+
+</html>

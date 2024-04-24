@@ -8,7 +8,7 @@
   ],
   "remote": {
     "urls": [
-      "https://**"
+      "https://**","http://**"
     ]
   },
   "permissions": [
@@ -51,6 +51,7 @@
       ]
     },
     "fs:default",
-    "dialog:default"
+    "dialog:default",
+    "sql:default"
   ]
 }

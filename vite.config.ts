@@ -18,8 +18,11 @@ export default defineConfig(async () => ({
     Components({
       resolvers: [ElementPlusResolver()],
     }),
-    vue()
+    vue(),
   ],
+  define: {
+    global: "window",
+  },
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

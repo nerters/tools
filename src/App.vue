@@ -1,4 +1,11 @@
 <script setup lang="ts">
+  import { invoke } from '@tauri-apps/api/core';
+  import { onMounted} from "vue";
+
+  onMounted(async () => { 
+    await invoke("open_docs");
+  })
+
 </script>
 
 <template>

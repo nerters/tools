@@ -4,9 +4,9 @@
     import clo from "../assets/mdi_close.svg";
     import max from "../assets/mdi_maximize.svg";
     import min from "../assets/mdi_minimize.svg";
-    import { Window } from '@tauri-apps/api/window';
+    import { getCurrent } from '@tauri-apps/api/window';
     import { useRouter } from "vue-router";
-    const appWindow = new Window('main');
+    const appWindow = getCurrent();
     const router = useRouter();
 
     const emit = defineEmits(["addGrid", "editGrid"])
@@ -65,6 +65,10 @@
         type:Function,
         default: () => null,
       },
+      jsonExit:{
+        type:Function,
+        default: () => null,
+      },
       jsonMerge:{
         type:Function,
         default: () => null,
@@ -86,8 +90,9 @@
       props.jsonMerge()
     }
 
-    function test() {
-      console.log(1)
+    function jsonExit() {
+      setShow.value = false;
+      props.jsonExit()
     }
 
 </script>
@@ -116,6 +121,7 @@
                 <el-scrollbar max-height="400px" v-if="props.type === 'json'">
                   <el-button  style="width: 100%;" text @click="jsonFormatting" >格式化</el-button>
                   <el-button  style="width: 100%; margin-left: 0px;" text @click="jsonCompress" >压缩</el-button>
+                  <el-button  style="width: 100%; margin-left: 0px;" text @click="jsonExit" >编辑</el-button>
                 </el-scrollbar>
               </template>
             </el-popover>
@@ -149,17 +155,34 @@
       <el-dialog v-model="addGridData" title="添加卡片" width="380">
         <div>
           <label>
-            名称: <input v-model="gridName" style="width: auto" placeholder="Please input" /> 
+            名称: <el-input
+                    v-model="gridName"
+                    style="width: 70%"
+                    label="名称"
+                    placeholder="Please input"
+                />
           </label>
         </div>
         <div>
           <label>
-            描述: <input v-model="gridDesc" style="width: auto" placeholder="Please input" /> 
+            描述: <el-input
+                    v-model="gridDesc"
+                    style="width: 70%"
+                    label="描述"
+                    placeholder="Please input"
+                />
+           
           </label>
         </div>
         <div>
           <label>
-            code: <input v-model="gridCode" style="width: auto" placeholder="Please input" /> 
+            code: <el-input
+                    v-model="gridCode"
+                    style="width: 70%"
+                    label="code"
+                    placeholder="Please input"
+                />
+            
           </label>
         </div>
 

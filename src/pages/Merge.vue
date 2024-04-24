@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, Ref, onUnmounted } from 'vue';
-import { writeTextFile, readTextFile, create, exists, BaseDirectory } from '@tauri-apps/plugin-fs';
+import { ref, onMounted } from 'vue';
+//import { writeTextFile, readTextFile, create, exists, BaseDirectory } from '@tauri-apps/plugin-fs';
 //import { basicSetup, EditorState, EditorView } from '@codemirror/basic-setup';
 import {MergeView} from "@codemirror/merge"
 import { basicSetup} from "codemirror"

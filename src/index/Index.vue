@@ -1,17 +1,20 @@
 <script setup lang="ts">
+import '../styles.css'
 import { ref, onMounted, watch, Ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
-const router = useRouter();
-
 import { writeTextFile, readTextFile, create, exists, BaseDirectory } from '@tauri-apps/plugin-fs';
 import Title from "../pages/Title.vue";
+
+
+
+const router = useRouter();
 
 const cacheFileName = 'tools.json';
 
 const layout:Ref<Array<any>>= ref([])
 
-const temp:Array<any> = [{"x":0,"y":0,"w":2,"h":4,"i":"JSON","type":"sys","code":"JSON","static":false,"moved":false},{"x":5,"y":0,"w":2,"h":2,"type":"sys","code":"测试1","i":"测试1","moved":false},{"x":6,"y":2,"w":2,"h":2,"type":"sys","code":"1","i":"1","moved":false},{"x":6,"y":4,"w":2,"h":2,"type":"sys","code":"2","i":"2","moved":false},{"x":7,"y":0,"w":2,"h":2,"type":"sys","code":"3","i":"3","moved":false},{"x":2,"y":0,"w":2,"h":2,"type":"sys","code":"Merge","i":"Merge","moved":false},{"x":2,"y":2,"w":2,"h":2,"type":"sys","code":"Img","desc":"图片工具","i":"图片","moved":false}]
+const temp:Array<any> = [{"x":0,"y":0,"w":2,"h":4,"i":"JSON","type":"sys","code":"JSON","desc":"json工具","static":false,"moved":false},{"x":2,"y":0,"w":2,"h":2,"type":"sys","code":"Merge","desc":"对比工具","i":"Merge","moved":false},{"x":0,"y":4,"w":2,"h":2,"type":"sys","code":"Img","desc":"图片工具","i":"图片","moved":false},{"x":2,"y":2,"w":4,"h":3,"type":"sys","code":"RsaPage","desc":"RSA加密","i":"RSA","moved":false},{"x":4,"y":0,"w":2,"h":2,"type":"sys","code":"Time","desc":"时间相关","i":"时间","moved":false},{"x":6,"y":6,"w":2,"h":2,"type":"sys","code":"CronTitle","desc":"定时器","i":"定时提醒","moved":false}]
 
 
 onMounted(async () => { 
@@ -84,8 +87,10 @@ function addItem(name: String, desc: String, code: String) {
 
 function openFun(type: String) {
   if (!editGridData.value) {
-    console.log(type);
-    router.push({path:"/main/"+type});  //跳转到对应菜单选项的页面
+    console.log( window.location.href)
+    let path = "/main/"+type;
+    console.log(path);
+    router.push({path:path.toString()});  //跳转到对应菜单选项的页面
   }
 }
 

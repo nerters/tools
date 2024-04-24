@@ -13,11 +13,12 @@
         "title": "tools",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": false,
+        "visible": false
       }
     ],
     "security": {
-      "csp": null,
+      "csp": "default-src 'self' customprotocol: asset:; img-src 'self' asset: https://asset.localhost",
 
       "assetProtocol": {
         "enable": true,
