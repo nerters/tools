@@ -1,3 +1,3 @@
-package com.tauri.tools
+package com.tauri.practice
 
 class MainActivity : TauriActivity()

@@ -4,11 +4,14 @@
   "description": "Capability for the main window",
   "windows": [
     "main",
-    "dev-*"
+    "dev-*",
+    "countDown-*",
+    "floating-*"
   ],
   "remote": {
     "urls": [
-      "https://**","http://**"
+      "https://**",
+      "http://**"
     ]
   },
   "permissions": [
@@ -37,6 +40,7 @@
     "fs:allow-read-text-file",
     "fs:allow-exists",
     "fs:allow-create",
+    "shell:allow-open",
     {
       "identifier": "fs:scope-appdata",
       "allow": [
@@ -50,8 +54,11 @@
         }
       ]
     },
+
     "fs:default",
     "dialog:default",
-    "sql:default"
+    "sql:default",
+    "shell:default",
+    "shell:default"
   ]
 }

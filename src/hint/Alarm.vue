@@ -2,7 +2,7 @@
     <div class="alarm-box" @click="close" >
       <div class="content">
         <p>{{ title }}</p>
-        
+        <p>已经触发{{ ((Math.floor(currentTime/1000)) - runTime) }} 秒</p>
       </div>
     </div>
   </template>
@@ -15,18 +15,34 @@
 
   const title = ref("")
   const cronId = ref("")
+
+
+  const currentTime = ref(Date.now())
+  const runTime = ref(0);
+
+  // 每秒更新一次时间戳
+  setInterval(() => {
+    currentTime.value = Date.now();
+  }, 1000);
+
+
   onMounted(async () => { 
     let tit = await appWindow.title();
-    let split = tit.split("_+||+_");
-    title.value = split[0];
-    cronId.value = split[1]
+    cronId.value = tit;
+    let cronData:any = await invoke("get_cron_info", {id: tit});
+    title.value = cronData.content;
+    runTime.value = cronData.update_time + cronData.interval
+
   })
+
+
+  
 
   async function close() {
       console.log(3);
       appWindow.close()
       await invoke("use_cron", {id: cronId.value});
-      appWindow.emit("ref_cron_list", true);
+      //appWindow.emit("ref_cron_list", true);
   }
 
 
@@ -40,8 +56,8 @@
    
 
     background-color: rgba(0, 0, 0, 0.5);
-    margin-top: -8px;
-    margin-left: -8px;
+    /* margin-top: -8px; */
+    /* margin-left: -8px; */
     color: white;
   }
   

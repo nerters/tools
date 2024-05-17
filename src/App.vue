@@ -9,7 +9,7 @@
 </script>
 
 <template>
-  <div style="height: inherit;">
+  <div style="height: auto;">
     <router-view></router-view>
   </div>
 

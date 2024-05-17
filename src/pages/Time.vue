@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="padding: 5px;">
         <label>
             时间戳：<el-input v-model="currentTime" style="width: 240px" placeholder="Please input" />
         </label>
@@ -17,3 +17,7 @@ const currentTime = ref(Date.now())
     }, 1000);
 
 </script>
+
+<style>
+
+</style>

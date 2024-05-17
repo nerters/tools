@@ -87,12 +87,30 @@ const routes: Array<RouteRecordRaw> = [
       children:[
         {
           //路由初始指向
-            path: 'Cron',
-            name: 'Cron',
+            path: 'Alarm',
+            name: 'Alarm',
             meta: {
-              title: 'Cron'
+              title: 'Alarm'
             },
-            component:()=>import('../hint/Cron.vue')
+            component:()=>import('../hint/Alarm.vue')
+        },
+        {
+          //路由初始指向
+            path: 'CountDown',
+            name: 'CountDown',
+            meta: {
+              title: 'CountDown'
+            },
+            component:()=>import('../hint/CountDown.vue')
+        },
+        {
+          //路由初始指向
+            path: 'Ment',
+            name: 'Ment',
+            meta: {
+              title: 'Ment'
+            },
+            component:()=>import('../hint/Ment.vue')
         }
       ]
   }

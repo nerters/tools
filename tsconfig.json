@@ -18,23 +18,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-
-    //添加---
-    "suppressImplicitAnyIndexErrors": true,		//允许字符串用作下标
-    "ignoreDeprecations":"5.0",		//高版本上句报错，此句解决。如此句报错可注释掉
-     "baseUrl": ".",			
-     "paths": {					
-      "@/*":[					
-        "src/*"					
-      ]							
-     }	
-
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "references": [{ "path": "./tsconfig.node.json" }],
-
-  //添加
-  "exclude":["node_modules"]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

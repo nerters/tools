@@ -28,6 +28,11 @@ const jsonMerge = () => {
   routerViewRef.value.jsonMerge()
 }
 
+const readCatalog = () => {
+  console.log(4)
+  routerViewRef.value.catalog()
+}
+
 
 const getCacheFile = async (cacheFileName: string | URL) : Promise<String> => {
   console.log("获取文件")
@@ -53,9 +58,9 @@ const saveCacheFile = async (cacheFileName: string | URL, data: string) => {
 
 </script>
 <template>
-  <Title :type="titleType" :jsonFormatting="jsonFormatting" :jsonCompress="jsonCompress" :jsonMerge="jsonMerge" :jsonExit="jsonExit" />
-
-  <div style="padding-top: 30px; height: inherit;">
+  <Title :type="titleType" :jsonFormatting="jsonFormatting" :jsonCompress="jsonCompress" :jsonMerge="jsonMerge" :jsonExit="jsonExit" :readCatalog="readCatalog"/>
+  
+  <div style="padding-top: 30px; height: auto;">
 
     <router-view v-slot:="{Component,route}" @title-type="(type: string) => {titleType = type}" :getCacheFile="getCacheFile" :saveCacheFile="saveCacheFile">
 		
@@ -69,5 +74,11 @@ const saveCacheFile = async (cacheFileName: string | URL, data: string) => {
 </template>
 
 <style>
-
+html,
+body,
+#app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
 </style>

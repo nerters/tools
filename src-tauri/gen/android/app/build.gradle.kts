@@ -6,10 +6,10 @@ plugins {
 
 android {
     compileSdk = 33
-    namespace = "com.tauri.tools"
+    namespace = "com.tauri.practice"
     defaultConfig {
         manifestPlaceholders["usesCleartextTraffic"] = "false"
-        applicationId = "com.tauri.tools"
+        applicationId = "com.tauri.practice"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

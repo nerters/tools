@@ -1,5 +1,5 @@
 [package]
-name = "tools"
+name = "practice"
 version = "0.0.0"
 description = "A Tauri App"
 authors = ["you"]
@@ -8,7 +8,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "tools_lib"
+name = "practice_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]
@@ -31,4 +31,7 @@ once_cell = "1.13.0"
 chrono = "0.4.33"
 
 file = "1.1.2"
+rdev = "0.5.3"
+lazy_static = "1.4.0"
+directories = "5.0.1"
 

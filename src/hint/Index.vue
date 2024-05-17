@@ -20,5 +20,11 @@
 </template>
 
 <style>
-
+html,
+body,
+#app {
+    height: auto;
+    margin: 0;
+    padding: 0;
+}
 </style>

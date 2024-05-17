@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Ref, onMounted, ref } from 'vue';
 import { invoke } from '@tauri-apps/api/core';
+import { getCurrent } from '@tauri-apps/api/window';
 
 const dataList:Ref<any> = ref([]);
 
@@ -13,19 +14,27 @@ const dataList:Ref<any> = ref([]);
 const currentTime = ref(Date.now())
 
 // 每秒更新一次时间戳
-setInterval(() => {
+setInterval(async () => {
   currentTime.value = Date.now();
+  await getCurrent().listen<any>("get_cron_info", (event) => {
+    let temp = event.payload;
+    for (let i = 0; i < dataList.value.length; i++) {
+      if (dataList.value[i].id === temp.id) {
+        dataList.value[i] = temp;
+        break;
+      } 
+    }
+  });
 }, 1000);
 
-// 每秒更新一次时间戳
-setInterval(async () => {
-  dataList.value = await invoke("get_list_cron");
-}, 10000);
+// // 每秒更新一次时间戳
+// setInterval(async () => {
+//   dataList.value = await invoke("get_list_cron");
+// }, 10000);
 
 onMounted(async () => { 
     dataList.value = await invoke("get_list_cron");
     console.log(await invoke("get_list_cron"))
-
 })
 
 
@@ -58,6 +67,11 @@ async function addCardSubmit() {
 }
 
 
+async function floatingWindow(dataId: string) {
+  await invoke("floating_window", {id: dataId});
+}
+
+
 async function removeItem(val:string) {
     const index = dataList.value.map((item: { name: any; }) => item.name).indexOf(val);
     let data = dataList.value[index]
@@ -70,26 +84,23 @@ async function removeItem(val:string) {
 
 <template>
     <el-button @click="addCard">添加</el-button>
-    <div class="flex flex-wrap gap-4">  
+    <div class="flex flex-wrap gap-4" style="padding: 5px;">  
         <el-card v-for="card in dataList" style="width: 480px" shadow="hover" >
             <div style="display: flex; justify-content: space-between;">
                 <div>
                     {{ card.content }}
-
-                   
                 </div>
-                <div v-if="card.interval - ((Math.floor(currentTime/1000)) - card.update_time) > 0">
+                <div v-if="card.is_use === 0">
                   倒计时{{ card.interval - ((Math.floor(currentTime/1000)) - card.update_time) }} 秒
                 </div>
-                <div v-if="card.interval - ((Math.floor(currentTime/1000)) - card.update_time) < 0" style="color: red;">
+                <div v-if="card.is_use === 1" style="color: red;">
                   触发
                 </div>
 
-               
+                <el-button plain @click="floatingWindow(card.id)">固定</el-button>
+
                 <span class="remove" @click="removeItem(card.name)">x</span>
             </div>
-            
-
         </el-card>
     </div>
 
@@ -145,6 +156,5 @@ async function removeItem(val:string) {
     top: 0;
     cursor: pointer;
 }
-
 
 </style>
