@@ -96,7 +96,7 @@
   <style scoped>
 
 
-  .image-uploader {
+.image-uploader {
   position: relative;
   width: 200px;
   height: 200px;
@@ -106,7 +106,6 @@
   justify-content: center;
   align-items: center;
   transition: border-color 0.3s;
-
 }
 
 .image-uploader.hovered {

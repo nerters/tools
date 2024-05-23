@@ -1,5 +1,5 @@
 use std::sync::atomic::{AtomicBool, Ordering};
-use dao::{cron::{alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP}, grid_info::{self, merge_data, GridInfo}};
+use dao::{cron::{self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP}, grid_info::{self, merge_data, GridInfo}};
 use idgen::IDGen;
 use rdev::{Button, EventType};
 use tauri::Manager;
@@ -21,34 +21,50 @@ fn compress_img(file_path: String, nwidth: u32, nheight: u32, img_type: String) 
 }
 
 #[tauri::command]
-fn savn_cron(name: String, content: String, interval: i64, appointed_time: i64) -> i64 {
+async fn savn_cron(name: String, content: String, cron_type: String, interval: i64, appointed_time: i64, category: String, pid: String) -> i64 {
     let idgen = IDGen::new(1);
     let id = idgen.new_id();
     let mut info = CronInfo::default();
     info.id = id.to_string();
     info.name = name;
     info.content = content;
+    info.cron_type = cron_type;
     info.interval = interval;
     info.appointed_time = appointed_time;
-    save(info);
+    info.category = category.clone();
+    info.pid = pid;
+    save(info.clone()).await;
+    if category == "cron" {
+        let mut map = CRON_MAP.lock().await;
+        map.insert(id.to_string(), info);
+    }
     id as i64
 }
 
 #[tauri::command]
-fn update_cron(id: String, name: String, content: String, interval: i64, appointed_time: i64) {
+fn update_cron(id: String, name: String, content: String, interval: i64, appointed_time: i64, pid: String, sort: i16, category: String, is_use: i64, cron_type: String) {
     let mut info = CronInfo::default();
     info.id = id;
     info.name = name;
     info.content = content;
     info.interval = interval;
     info.appointed_time = appointed_time;
+    info.pid = pid;
+    info.sort = sort;
+    info.category = category;
+    info.is_use = is_use;
+    info.cron_type = cron_type;
     update_tokio(info);
 }
 
 #[tauri::command]
 async fn get_list_cron() -> Vec<CronInfo> {
-    let map = CRON_MAP.lock().await;
-    map.values().cloned().collect()
+    cron::get_list_cache().await
+}
+
+#[tauri::command]
+async fn get_tree_cron() -> Vec<CronInfo> {
+    cron::get_tree().await
 }
 
 #[tauri::command]
@@ -77,7 +93,16 @@ async fn use_cron(handle: tauri::AppHandle, id : String) {
             temp.update_time = get_now_time_m();
             temp.is_use = 0;
             map.insert(id.clone(), temp.clone());
+
+            let mut win_key = "countDown-".to_string() + &id.clone();
+
             if let Some(window) = handle.get_webview_window("main") {
+                //let list: Vec<CronInfo> = map.values().cloned().collect();
+                //window.emit("get_list_cron", list).unwrap();
+                window.emit("get_cron_info", temp.clone()).unwrap();
+            }
+
+            if let Some(window) = handle.get_webview_window(&win_key) {
                 //let list: Vec<CronInfo> = map.values().cloned().collect();
                 //window.emit("get_list_cron", list).unwrap();
                 window.emit("get_cron_info", temp).unwrap();
@@ -99,6 +124,7 @@ async fn get_cron_info(id : String) -> CronInfo {
         let map = CRON_MAP.lock().await;
         if let Some(temp) = map.get(&id) {
             let temp = temp.clone();
+            println!("******{}", temp.update_time);
             return temp;    
         }
     }
@@ -182,12 +208,20 @@ async fn get_grid_by_id(id: String) -> GridInfo {
 #[tauri::command]
 async fn floating_window(handle: tauri::AppHandle, id: String) {
     let mut win_key = "countDown-".to_string();
-    let mut title = String::from("");
+    let mut info_id = String::from("");
+    let height = 100.0;
+    let mut width = 288.0;
     let map = CRON_MAP.lock().await;
     if let Some(temp) = map.get(&id) {
-        let temp = temp.clone();
+        
         win_key += &temp.id.clone();
-        title += &temp.name.clone();
+        info_id += &temp.id.clone();
+        if temp.category != "cron" {
+            return ;
+        }
+        if temp.interval > 86400 || temp.appointed_time - get_now_time_m() > 86400 {
+            width = 388.0;
+        }
     }
 
     
@@ -198,8 +232,8 @@ async fn floating_window(handle: tauri::AppHandle, id: String) {
             &handle,
             win_key, /* the unique window label */
             tauri::WebviewUrl::App("/hint/CountDown".parse().unwrap())
-          ).title(title)
-          .inner_size(300.0, 100.0)
+          ).title(info_id)
+          .inner_size(width, height)
           .decorations(false)
           .transparent(true)
           .position(800.0,100.0)
@@ -320,7 +354,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![compress_img, open_docs,savn_cron, update_cron, 
             del_cron, get_list_cron, use_cron, read_file, get_cron_info, grid_merge_data, add_grid, 
-            update_grid, delete_grid_by_id, get_grid_by_id, floating_window])
+            update_grid, delete_grid_by_id, get_grid_by_id, floating_window, get_tree_cron])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

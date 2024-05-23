@@ -191,10 +191,6 @@
 
       <el-dialog v-model="addGridData" title="添加卡片" width="380">
 
-
-
-
-
         <el-form
           ref="form"
           style="max-width: 600px"
@@ -220,6 +216,7 @@
             >
               <el-option label="打开网站" value="openWeb" />
               <el-option label="功能页面" value="funPage" />
+              <el-option label="占位" value="placeholder" />
             </el-select>
           </el-form-item>
           <div v-if="sizeForm.gridType === 'openWeb'">
@@ -279,6 +276,7 @@
             <el-button @click="addGridData = false">取消</el-button>
           </el-form-item>
         </el-form>
+        
       </el-dialog>
 
 

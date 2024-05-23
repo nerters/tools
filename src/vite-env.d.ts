@@ -5,3 +5,8 @@ declare module "*.vue" {
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }
+
+
+declare module 'vue3-flip-countdown';
+
+declare module 'vue3-smooth-dnd';

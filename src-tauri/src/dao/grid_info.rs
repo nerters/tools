@@ -186,8 +186,6 @@ pub async fn update(info: GridInfo) -> bool {
     if h <= 0 {
         h = 2;
     }
-    println!("x : {}", info.x);
-    println!("y : {}", info.y);
     let conn = get_connect().acquire().await.expect("Error get_connect from db pool");
     let result = sqlx::query("UPDATE grid_info SET name = ?, describe = ?,uri=?, code=?, update_time=?, classify=?, 
     is_sys=?, x=?, y=?, w=?, h=?,
@@ -219,7 +217,6 @@ pub async fn delete_by_id(id: String) -> bool {
     .bind(id)
     .execute(&mut conn.detach())
     .await;
-
     match result {
         Ok(_) => {
             println!("创建数据成功");

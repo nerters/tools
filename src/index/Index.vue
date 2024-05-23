@@ -9,8 +9,6 @@ import Title from "../pages/Title.vue";
 
 import { open } from '@tauri-apps/plugin-shell';
 
-
-
 const router = useRouter();
 
 const cacheFileName = 'tools.json';
@@ -177,7 +175,7 @@ async function addItem(name: String, desc: String, code: String) {
         y: y, // puts it at the bottom
         w: 2,
         h: 2,
-        type: "sys",
+        type: "funPage",
         code: code?code:name,
         desc: desc,
         i: name,
@@ -194,7 +192,7 @@ function openFun(id: String) {
     let data = layout.value[index];
     if (data.type === "openWeb") {
       open(data.uri)
-    } else {
+    } else if (data.type === "funPage") {
       console.log( window.location.href)
       let path = "/main/"+data.code;
       console.log(path);
@@ -265,6 +263,13 @@ async function merge_data():Promise<any[]> {
 }
 
 
+
+// window.addEventListener("resize", () => {
+//   document.getElementById("vditor")?.setAttribute("style", "height:99.5%;");
+// })
+
+
+
 </script>
 
 <template>
@@ -295,6 +300,7 @@ async function merge_data():Promise<any[]> {
 
             <div style="position: absolute; font-size: 8px; margin-top: -5px; margin-left: 3px ;" v-if="item.type === 'openWeb'"> w </div>
             <div style="position: absolute; font-size: 8px; margin-top: -5px; margin-left: 3px ;" v-if="item.type === 'funPage'"> f </div>
+            <div style="position: absolute; font-size: 8px; margin-top: -5px; margin-left: 3px ;" v-if="item.type === 'placeholder'"> p </div>
 
             <div v-if="item.i.toString() === 'JSON'" style="text-align: center; " >
               {{ item.i }}
@@ -340,6 +346,7 @@ async function merge_data():Promise<any[]> {
         >
           <el-option label="打开网站" value="openWeb" />
           <el-option label="功能页面" value="funPage" />
+          <el-option label="占位" value="placeholder" />
         </el-select>
       </el-form-item>
       <div v-if="gridForm.gridType === 'openWeb'">
@@ -358,6 +365,8 @@ async function merge_data():Promise<any[]> {
         <el-button @click="editInfo = false">取消</el-button>
       </el-form-item>
     </el-form>
+
+
   </el-dialog>
 
 
@@ -401,6 +410,9 @@ html,
 body,
 #app {
     height: auto;
+    margin: 0;
+    padding: 0;
+    scrollbar-width: none
 }
 
 </style>

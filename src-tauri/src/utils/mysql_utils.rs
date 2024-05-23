@@ -42,9 +42,12 @@ pub async fn init_mysql_pool(db_url: &str) {
         'id' TEXT NOT NULL,
         'name' TEXT,
         'content' TEXT,
+        'cron_type' TEXT DEFAULT 'interval',
         'interval' INTEGER,
         'appointed_time' INTEGER,
         'is_use' INTEGER,
+        'pid' TEXT NOT NULL DEFAULT '0',
+        'category' TEXT NOT NULL,
         'create_time' integer,
         'creator_lid' TEXT,
         'creator_name' TEXT,
@@ -56,7 +59,38 @@ pub async fn init_mysql_pool(db_url: &str) {
         'deleted' integer,
         'update_time' integer,
         PRIMARY KEY ('id')
-      );")
+      );
+      
+      CREATE TABLE IF NOT EXISTS 'grid_info' (
+        'id' TEXT NOT NULL,
+        'name' TEXT,
+        'describe' TEXT,
+        'uri' TEXT,
+        'code' TEXT,
+        'classify' TEXT,
+        'is_sys' integer DEFAULT 0,
+        'x' integer,
+        'y' integer,
+        'w' integer,
+        'h' integer,
+        'template_id' text,
+        'run_code' TEXT,
+        'create_time' integer,
+        'creator_lid' TEXT,
+        'creator_name' TEXT,
+        'updater_lid' TEXT,
+        'updater_name' TEXT,
+        'up_ver' integer,
+        'sort' integer,
+        'tenant_id' integer,
+        'deleted' integer,
+        'update_time' integer,
+        PRIMARY KEY ('id'),
+        CONSTRAINT 'only' UNIQUE ('code' COLLATE BINARY ASC) ON CONFLICT FAIL
+      );
+      
+      
+      ")
         .execute(&pool)
         .await;
 
