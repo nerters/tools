@@ -9,12 +9,19 @@ import { basicSetup} from "codemirror"
 const editorRef = ref();
 const editorView = ref();
 
+defineProps({
+      getCacheFile:{
+        type:Function,
+        default: () => null,
+      },
+      saveCacheFile:{
+        type:Function,
+        default: () => null,
+      },
+    })
+
 onMounted(async () => { 
-
-
     initEditor();
-
-
 })
 
 const initEditor = () => {

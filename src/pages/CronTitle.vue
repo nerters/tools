@@ -1,187 +1,165 @@
 <script setup lang="ts">
-import { Ref, onMounted, reactive, ref } from 'vue';
-import { invoke } from '@tauri-apps/api/core';
-import { getCurrent } from '@tauri-apps/api/window';
-import { Container, Draggable } from "vue3-smooth-dnd"
+    import { onMounted, reactive, ref } from 'vue';
+    import { invoke } from '@tauri-apps/api/core';
+    import { getCurrent } from '@tauri-apps/api/window';
+    import { Container, Draggable } from "vue3-smooth-dnd"
 
-import { ask } from '@tauri-apps/plugin-dialog';
-import clo from "../assets/mdi_close.svg";
+    import { ask } from '@tauri-apps/plugin-dialog';
+    import clo from "../assets/mdi_close.svg";
 
-const currentTime = ref(Date.now())
+    defineProps({
+      getCacheFile:{
+        type:Function,
+        default: () => null,
+      },
+      saveCacheFile:{
+        type:Function,
+        default: () => null,
+      },
+    })
 
-const addCardData = ref(false);
+    const currentTime = ref(Date.now())
 
-const isHovered = ref(false);
+    const addCardData = ref(false);
 
-const handleMouseOver = () => {
-    isHovered.value = true;
-  };
+    const isHovered = ref(false);
 
-  const handleMouseLeave = () => {
-    isHovered.value = false;
-  };
+    const handleMouseOver = () => {
+      isHovered.value = true;
+    };
 
-// const content = ref("")
-// const interval = ref("")
-// const name = ref("")
+    const handleMouseLeave = () => {
+      isHovered.value = false;
+    };
 
-const sizeForm = reactive({
-  cronId: "",
-  cronName: '',
-  cronContent: '',
-  cronType: '',
-  interval: "0",
-  appointedTime:new Date(),
-  category: "",
-  pid: "",
-})
+    const sizeForm = reactive({
+      cronId: "",
+      cronName: '',
+      cronContent: '',
+      cronType: '',
+      interval: "0",
+      appointedTime:new Date(),
+      category: "",
+      pid: "",
+    })
 
-// 每秒更新一次时间戳
-setInterval(async () => {
-  currentTime.value = Date.now();
-}, 1000);
+    // 每秒更新一次时间戳
+    setInterval(async () => {
+      currentTime.value = Date.now();
+    }, 1000);
 
-onMounted(async () => { 
-
-    await getCurrent().listen<any>("get_cron_info", (event) => {
-      let temp = event.payload;
-      const columnIndex = scene.children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.pid);
-      if (columnIndex < 0) {
-        for ( let i = 0; i < scene.children.length; i++) {
-          let index = scene.children[i].children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.pid);
-          if (index >= 0) {
-            let itemIndex = scene.children[i].children[index].children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.id);
-            scene.children[i].children[index].children[itemIndex] = temp;
+    onMounted(async () => { 
+        await getCurrent().listen<any>("get_cron_info", (event) => {
+          let temp = event.payload;
+          const columnIndex = scene.children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.pid);
+          if (columnIndex < 0) {
+            for ( let i = 0; i < scene.children.length; i++) {
+              let index = scene.children[i].children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.pid);
+              if (index >= 0) {
+                let itemIndex = scene.children[i].children[index].children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.id);
+                scene.children[i].children[index].children[itemIndex] = temp;
+              }
+            }
+          } else {
+            const index = scene.children[columnIndex].children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.id);
+            if (index >= 0) {
+              let card = scene.children[columnIndex].children[index];
+              temp.children = card.children;
+              scene.children[columnIndex].children[index] = temp;
+            }
           }
+        });
+        scene.children = await invoke("get_tree_cron");
+    })
+
+    function addCard(category: string, pid: string) {
+        addCardData.value = !addCardData.value;
+        sizeForm.category = category;
+        sizeForm.pid = pid;
+    }
+
+    async function addCardSubmit() {
+        if (sizeForm.cronName && (sizeForm.interval || sizeForm.appointedTime) && sizeForm.cronContent) {
+            await invoke("savn_cron", {name: sizeForm.cronName, content: sizeForm.cronContent, cronType: sizeForm.cronType, interval:parseInt(sizeForm.interval), 
+              appointedTime: Math.floor(sizeForm.appointedTime.getTime()/1000), category: sizeForm.category, pid: sizeForm.pid});
+            scene.children = await invoke("get_tree_cron");
+            addCardData.value = !addCardData.value;
+            addCardData.value = false;
+            sizeForm.cronName = "";
+            sizeForm.cronContent = "";
+            sizeForm.cronType = "";
+            sizeForm.interval = "0";
+            sizeForm.appointedTime = new Date();
+            sizeForm.category = "";
+            sizeForm.pid = "";
         }
+    }
+
+    async function floatingWindow(dataId: string) {
+      await invoke("floating_window", {id: dataId});
+    }
+
+    async function removeItem(dataId:string) {
+      if (dataId === '-1' || dataId === '0') {
+        alert("系统默认不能删除!")
       } else {
-        const index = scene.children[columnIndex].children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.id);
-        if (index >= 0) {
-          let card = scene.children[columnIndex].children[index];
-          temp.children = card.children;
-          scene.children[columnIndex].children[index] = temp;
+        const answer = await ask('是否删除?', {
+          title: 'Tauri',
+          kind: 'warning',
+          okLabel: '是',
+          cancelLabel: '否',
+        });
+        if (answer) {
+          await invoke("del_cron", {id: dataId});
+          scene.children = await invoke("get_tree_cron");
         }
       }
-    });
-
-
-    scene.children = await invoke("get_tree_cron");
-
-    console.log("------" + JSON.stringify(scene.children))
-})
-
-
-
-
-
-
-function addCard(category: string, pid: string) {
-    console.log("category---" + category)
-    console.log("pid---" + pid)
-    addCardData.value = !addCardData.value;
-    sizeForm.category = category;
-    sizeForm.pid = pid;
-}
-
-async function addCardSubmit() {
-
-    if (sizeForm.cronName && (sizeForm.interval || sizeForm.appointedTime) && sizeForm.cronContent) {
-
-        let id: string = await invoke("savn_cron", {name: sizeForm.cronName, content: sizeForm.cronContent, cronType: sizeForm.cronType, interval:parseInt(sizeForm.interval), 
-          appointedTime: Math.floor(sizeForm.appointedTime.getTime()/1000), category: sizeForm.category, pid: sizeForm.pid});
-      
-        scene.children = await invoke("get_tree_cron");
-        //await props.saveCacheFile(cacheFileName, JSON.stringify(dataList.value))
-        addCardData.value = !addCardData.value;
-        addCardData.value = false;
-        sizeForm.cronName = "";
-        sizeForm.cronContent = "";
-        sizeForm.cronType = "";
-        sizeForm.interval = "0";
-        sizeForm.appointedTime = new Date();
-
-        sizeForm.category = "";
-        sizeForm.pid = "";
     }
-}
 
+    const lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
 
-async function floatingWindow(dataId: string) {
-  await invoke("floating_window", {id: dataId});
-}
+    const cardColors = [
+      'azure',
+      'beige',
+      'bisque',
+      'blanchedalmond',
+      'burlywood',
+      'cornsilk',
+      'gainsboro',
+      'ghostwhite',
+      'ivory',
+      'khaki'
+    ]
 
-
-async function removeItem(dataId:string) {
-  if (dataId === '-1' || dataId === '0') {
-    alert("系统默认不能删除!")
-  } else {
-    const answer = await ask('是否删除?', {
-      title: 'Tauri',
-      kind: 'warning',
-      okLabel: '是',
-      cancelLabel: '否',
-    });
-
-    if (answer) {
-      await invoke("del_cron", {id: dataId});
-      scene.children = await invoke("get_tree_cron");
+    const pickColor = () => {
+      const rand = Math.floor(Math.random() * 10)
+      return cardColors[rand]
     }
-  }
-    //await props.saveCacheFile(cacheFileName, JSON.stringify(dataList.value))
-}
 
+    const applyDrag = async (id: string,  arr: any, dragResult: any) => {
+      const { removedIndex, addedIndex, payload } = dragResult
+      if (removedIndex === null && addedIndex === null) return arr
 
+      const result = [...arr]
+      let itemToAdd = payload
 
+      if (removedIndex !== null) {
+        itemToAdd = result.splice(removedIndex, 1)[0]
+      }
 
-//-------
-
-const lorem = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
-
-
-const cardColors = [
-  'azure',
-  'beige',
-  'bisque',
-  'blanchedalmond',
-  'burlywood',
-  'cornsilk',
-  'gainsboro',
-  'ghostwhite',
-  'ivory',
-  'khaki'
-]
-
-const pickColor = () => {
-  const rand = Math.floor(Math.random() * 10)
-  return cardColors[rand]
-}
-
-const applyDrag = async (id: string,  arr: any, dragResult: any) => {
-  const { removedIndex, addedIndex, payload } = dragResult
-  if (removedIndex === null && addedIndex === null) return arr
-
-  const result = [...arr]
-  let itemToAdd = payload
-
-  if (removedIndex !== null) {
-    itemToAdd = result.splice(removedIndex, 1)[0]
-  }
-
-  if (addedIndex !== null) {
-    itemToAdd.pid = id;
-    result.splice(addedIndex, 0, itemToAdd)
-  }
-  for (let i = 0; i < result.length; i++) {
-    console.log("更新")
-    let temp = result[i];
-    await invoke("update_cron", {id: temp.id, name: temp.name, content: temp.content, interval: temp.interval, appointedTime: temp.appointed_time, 
-                                  pid: temp.pid, sort: i, category: temp.category, isUse: temp.is_use, cronType: temp.cron_type});
-  }
-  return result
-}
-
+      if (addedIndex !== null) {
+        itemToAdd.pid = id;
+        result.splice(addedIndex, 0, itemToAdd)
+      }
+      for (let i = 0; i < result.length; i++) {
+        let temp = result[i];
+        await invoke("update_cron", {id: temp.id, name: temp.name, content: temp.content, interval: temp.interval, appointedTime: temp.appointed_time, 
+                                      pid: temp.pid, sort: i, category: temp.category, isUse: temp.is_use, cronType: temp.cron_type});
+      }
+      return result
+    }
 
     let scene = reactive({
       type: 'container',
@@ -234,8 +212,6 @@ const applyDrag = async (id: string,  arr: any, dragResult: any) => {
       ]
     })
 
-
-
     async function onColumnDrop (dropResult: any) {
       const scene1 = Object.assign({}, scene)
       scene1.children = await applyDrag("-2", scene1.children, dropResult)
@@ -243,49 +219,37 @@ const applyDrag = async (id: string,  arr: any, dragResult: any) => {
     }
 
     async function onCardDrop (columnId: any, dropResult: { removedIndex: any; addedIndex: any; payload?: any; }) {
-      console.log("-----" + JSON.stringify(dropResult))
       if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
         const scene1 = Object.assign({}, scene)
         const column = scene1.children.filter((p: { id: any; }) => p.id === columnId)[0]
         const columnIndex = scene1.children.indexOf(column)
         const newColumn = Object.assign({}, column)
-
         if((dropResult.removedIndex == null && dropResult.addedIndex >= 0)){
-          // your action / api call
           dropResult.payload.loading = true
-          // simulate api call
-          setTimeout(function(){ dropResult.payload.loading = false }, (Math.random() * 5000) + 1000); 
+          setTimeout(function(){ dropResult.payload.loading = false }, (Math.random() * 2000) + 1000); 
         }
-
         newColumn.children = await applyDrag(scene1.children[columnIndex].id, newColumn.children, dropResult)
         scene1.children.splice(columnIndex, 1, newColumn)
-
         scene.children = scene1.children
       }
     }
     
     function getCardPayload (columnId: any) {
       return (index: number) => {
-        console.log("index******" + index)
         return scene.children.filter(p => p.id === columnId)[0].children[index]
       }
     }
 
     async function onItemDrop (id1: any, id2: any, dropResult: any) {
-
       if (dropResult.removedIndex !== null || dropResult.addedIndex !== null) {
         const scene1 = Object.assign({}, scene)
         const columnList = scene1.children.filter((p: { id: any; }) => p.id === id1)[0]
         const column = columnList.children.filter((p: { id: any; }) => p.id === id2)[0]
         const columnIndex = columnList.children.indexOf(column)
         const newColumn = Object.assign({}, column)
-
         if((dropResult.removedIndex == null && dropResult.addedIndex >= 0)){
-          // your action / api call
-          
           dropResult.payload.loading = true
-          // simulate api call
-          setTimeout(function(){ dropResult.payload.loading = false }, (Math.random() * 5000) + 1000); 
+          setTimeout(function(){ dropResult.payload.loading = false }, (Math.random() * 2000) + 1000); 
         }
         if (dropResult.removedIndex !== null && dropResult.removedIndex - newColumn.children.length >= 0) {
           dropResult.removedIndex = dropResult.removedIndex - newColumn.children.length;
@@ -293,10 +257,8 @@ const applyDrag = async (id: string,  arr: any, dragResult: any) => {
         if (dropResult.addedIndex !== null && dropResult.addedIndex - newColumn.children.length >= 0) {
           dropResult.addedIndex = dropResult.addedIndex - newColumn.children.length;
         }
-        
         newColumn.children = await applyDrag(columnList.children[columnIndex].id, newColumn.children, dropResult)
         columnList.children.splice(columnIndex, 1, newColumn)
-
         scene.children = scene1.children
       }
     }
@@ -493,7 +455,6 @@ const applyDrag = async (id: string,  arr: any, dragResult: any) => {
           <div class="add-image" >
             <span >+</span>
           </div>
-
         </div>
       </div>
 

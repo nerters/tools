@@ -1,9 +1,6 @@
-use std::sync::atomic::{AtomicBool, Ordering};
 use dao::{cron::{self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP}, grid_info::{self, merge_data, GridInfo}};
 use idgen::IDGen;
-use rdev::{Button, EventType};
 use tauri::Manager;
-use tauri::async_runtime::spawn;
 use img::img_utils::compress;
 use utils::{date_util::get_now_time_m, mysql_utils::init_mysql_pool};
 mod img;
@@ -11,9 +8,6 @@ mod json;
 mod dao;
 mod utils;
 
-static FLOATING: AtomicBool = AtomicBool::new(false);
-
-static IS_SIMULATE:bool = false;
 
 #[tauri::command]
 fn compress_img(file_path: String, nwidth: u32, nheight: u32, img_type: String) -> String {
@@ -250,85 +244,6 @@ async fn floating_window(handle: tauri::AppHandle, id: String) {
     }
 }
 
-
-
-
-//悬浮窗口
-async fn floating_window111(handle: tauri::AppHandle){
-    spawn(async move {
-   
-        // 检查标志位，如果线程已经启动，则不再执行
-        if FLOATING.load(Ordering::SeqCst) {
-            println!("悬浮窗口线程已启动");
-            return;
-        }
-      
-        // 设置标志位，表示线程已经启动
-        FLOATING.store(true, Ordering::SeqCst);
-        rdev::listen(move |event| {
-            let is_block: bool = match event.event_type {
-                EventType::ButtonPress(button) => {
-                    match button {
-                        Button::Right => {
-                            println!("right");
-                             unsafe {
-                                !IS_SIMULATE
-                             }
-                        }
-                        _ => { false }
-                    }
-                }
-                EventType::ButtonRelease(button) => {
-                    match button {
-                        Button::Right => {
-                            println!("right");
-                            unsafe {
-                                !IS_SIMULATE
-                            }
-                        }
-                        _ => { false }
-                    }
-                }
-                
-                _ => { false }
-            };
-            if is_block {
-                let docs_window = tauri::WebviewWindowBuilder::new(
-                    &handle,
-                    "floating-111", /* the unique window label */
-                    tauri::WebviewUrl::App("/hint/Ment".parse().unwrap())
-                  ).title("test")
-                  .inner_size(100.0, 100.0)
-                  .decorations(false)
-                  .transparent(true)
-                  .position(0.0,200.0)
-                  .build();
-    
-                match docs_window {
-                    Ok(win) => {
-                        //win.emit("buttondown", ButtonPayload { button: get_button_name(&button), x: MOUSE_POSITION.0, y: MOUSE_POSITION.1 }).unwrap();
-    
-                        win.set_always_on_top(true);
-                        println!("启动窗口成功!");
-                    },
-                    Err(e) => {
-                        println!("启动窗口失败!{}", e);
-    
-                    }, 
-                }
-            }
-            // if is_block {
-            //     None
-            // } else {
-            //     Some(event)
-            // }
-        }).unwrap();
-        println!("悬浮窗口线程已结束");
-        // 设置标志位，表示线程已经启动
-        FLOATING.store(false, Ordering::SeqCst);
-    });
-
-}
 
 
 

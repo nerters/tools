@@ -15,11 +15,10 @@ const cacheFileName = 'tools.json';
 
 const layout:Ref<Array<any>>= ref([])
 
-const temp:Array<any> = [{"x":0,"y":0,"w":2,"h":4,"i":"JSON","type":"sys","code":"JSON","desc":"json工具","static":false,"moved":false},{"x":2,"y":0,"w":2,"h":2,"type":"sys","code":"Merge","desc":"对比工具","i":"Merge","moved":false},{"x":0,"y":4,"w":2,"h":2,"type":"sys","code":"Img","desc":"图片工具","i":"图片","moved":false},{"x":2,"y":2,"w":4,"h":3,"type":"sys","code":"RsaPage","desc":"RSA加密","i":"RSA","moved":false},{"x":4,"y":0,"w":2,"h":2,"type":"sys","code":"Time","desc":"时间相关","i":"时间","moved":false},{"x":6,"y":6,"w":2,"h":2,"type":"sys","code":"CronTitle","desc":"定时器","i":"定时提醒","moved":false}]
+const temp:Array<any> = [{"x":2,"y":0,"w":2,"h":2,"type":"funPage","is_sys":0,"code":"Merge","desc":"对比两段文字","i":"Merge","id":"128285195614912513","template_id":"","run_code":"","uri":"","update_time":0,"moved":false},{"x":10,"y":0,"w":2,"h":2,"type":"funPage","is_sys":0,"code":"Img","desc":"图片工具","i":"图片","id":"128285195615076353","template_id":"","run_code":"","uri":"","update_time":0,"moved":false},{"x":0,"y":2,"w":2,"h":2,"type":"funPage","is_sys":0,"code":"RsaPage","desc":"RSA加密","i":"RSA","id":"128285195615240193","template_id":"","run_code":"","uri":"","update_time":0,"moved":false},{"x":2,"y":2,"w":2,"h":2,"type":"funPage","is_sys":0,"code":"Time","desc":"时间相关","i":"时间","id":"128285195615469569","template_id":"","run_code":"","uri":"","update_time":0,"moved":false},{"x":4,"y":0,"w":6,"h":3,"type":"funPage","is_sys":0,"code":"CronTitle","desc":"定时器","i":"定时提醒","id":"128285195615698945","template_id":"","run_code":"","uri":"","update_time":0,"moved":false},{"x":0,"y":0,"w":2,"h":2,"type":"funPage","is_sys":0,"code":"JSON","desc":"json格式","i":"JSON","id":"128285229827686401","template_id":"","run_code":"","uri":"","update_time":0,"moved":false},{"x":0,"y":4,"w":12,"h":1,"type":"placeholder","is_sys":0,"code":"fengexian","desc":"","i":"分割线","id":"128285476236427265","template_id":"","run_code":"","uri":"","update_time":0,"moved":false}]
 
 
 onMounted(async () => { 
-
     //判断默认文件是否存在
     const exit = await exists(cacheFileName, { baseDir: BaseDirectory.AppData });
     if (!exit) {
@@ -34,17 +33,13 @@ onMounted(async () => {
     } else {
       layout.value = temp
     }
-
-
     
     layout.value = await merge_data();
-
     index.value = layout.value.length;
 
     const userComputed = computed(() => {
         return JSON.parse(JSON.stringify(layout.value))
     })
-
     watch(userComputed, async (newValue, oldValue) => {
       if (JSON.stringify(newValue) != JSON.stringify(oldValue)) {
         await writeTextFile(cacheFileName, JSON.stringify(layout.value), { baseDir: BaseDirectory.AppData });
@@ -59,14 +54,11 @@ const editGridData = ref(false);
 const addGridData = ref<any>();
 const colNum = ref(12);
 const index = ref(0);
-
-
 const editInfo = ref(false);
 
 
 async function removeItem(val:string) {
     const index = layout.value.map(item => item.code).indexOf(val);
-    console.log("index" + index)
     let data = layout.value[index];
     if (data.id) {
       await invoke("delete_grid_by_id", {id: data.id});
@@ -76,7 +68,6 @@ async function removeItem(val:string) {
 
 function exitItem(id: string) {
   const index = layout.value.map(item => item.id).indexOf(id);
-  console.log("index" + index)
   let data = layout.value[index];
   gridForm.id = data.id;
   gridForm.gridName = data.i;
@@ -89,7 +80,6 @@ function exitItem(id: string) {
   gridForm.gridW = data.w;
   gridForm.gridH = data.h;
   editInfo.value = true;
-  console.log(editInfo.value)
 }
 
 
@@ -151,7 +141,6 @@ const gridForm = reactive({
 
 
 watch(addGridData, async () => {
-  console.log("addGridData")
   if (addGridData.value) {
     await addItem(addGridData.value.name, addGridData.value.desc, addGridData.value.code)
   }
@@ -159,7 +148,6 @@ watch(addGridData, async () => {
 
 
 watch(editGridData, async () => {
-  console.log("editGridData")
   if (!editGridData.value) {
     layout.value = await merge_data();
   }
@@ -181,7 +169,6 @@ async function addItem(name: String, desc: String, code: String) {
         i: name,
         id: dataId ? dataId.toString():"",
     });
-
     // Increment the counter to ensure key is always unique.
     index.value += 1;
 }
@@ -193,10 +180,8 @@ function openFun(id: String) {
     if (data.type === "openWeb") {
       open(data.uri)
     } else if (data.type === "funPage") {
-      console.log( window.location.href)
       let path = "/main/"+data.code;
-      console.log(path);
-      router.push({path:path.toString()});  //跳转到对应菜单选项的页面
+      router.push({path: path});  //跳转到对应菜单选项的页面
     }
 
   }
@@ -236,7 +221,7 @@ async function merge_data():Promise<any[]> {
       })
     }
 
-    console.log("tempList", JSON.stringify(tempList));
+    //console.log("tempList", JSON.stringify(tempList));
 
     let gridList: Array<any> = await invoke("grid_merge_data", {dataList: tempList});
     let list = [];
@@ -261,13 +246,6 @@ async function merge_data():Promise<any[]> {
     }
     return list;
 }
-
-
-
-// window.addEventListener("resize", () => {
-//   document.getElementById("vditor")?.setAttribute("style", "height:99.5%;");
-// })
-
 
 
 </script>
@@ -316,11 +294,6 @@ async function merge_data():Promise<any[]> {
 
 
   <el-dialog v-model="editInfo" title="添加卡片" width="380">
-
-
-
-
-
     <el-form
       ref="form"
       style="max-width: 600px"
@@ -365,8 +338,6 @@ async function merge_data():Promise<any[]> {
         <el-button @click="editInfo = false">取消</el-button>
       </el-form-item>
     </el-form>
-
-
   </el-dialog>
 
 

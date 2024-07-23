@@ -1,7 +1,7 @@
 <template>
     
     <div class="alarm-box" data-tauri-drag-region >
-      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;" data-tauri-drag-region>
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: 5px; padding-right: 5px; " data-tauri-drag-region>
         <div style="display: flex; align-items: center; justify-content: center;">
           {{ title }}
         </div>
@@ -44,6 +44,7 @@
     cronId.value = infoId;
     let cronData:any = await invoke("get_cron_info", {id: infoId});
     title.value = cronData.content;
+    await appWindow.setTitle(cronData.name);
     console.log(cronData.cron_type)
     if (cronData.cron_type === "interval") {
       runTime.value = timestampToTime((cronData.update_time + cronData.interval) * 1000)

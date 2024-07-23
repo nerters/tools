@@ -114,7 +114,6 @@ pub async fn get_list_by_pid_and_category(pid: String, category: String) -> Vec<
     if !params.is_empty() {
         param +=  &("where ".to_string() + &params.join(" and "));
     }
-    println!("****{}", param);
     let type_list = sqlx::query(&("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category from cron_title ".to_string() + &param))
     .map(|row: SqliteRow| {
         CronInfo{ id: row.get(0), name: row.get(1), content: row.get(2), interval: row.get(3), appointed_time: row.get(4), create_time: row.get(5), 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-    import { reactive, ref } from "vue";
+    import { reactive, ref, watch } from "vue";
     import icon from "../assets/32x32.png";
     import clo from "../assets/mdi_close.svg";
     import max from "../assets/mdi_maximize.svg";
@@ -122,6 +122,20 @@
       props.readCatalog()
     }
 
+
+    //div事情焦点事件
+    const onbourfun = () => {
+      setShow.value = false;
+    }
+    watch(
+      () => setShow.value,
+      (val) => {
+        console.log(val)
+        val ? document.addEventListener('mousedown', onbourfun) : document.removeEventListener('mousedown', onbourfun) }
+    )
+
+
+
 </script>
 
 <template>
@@ -133,7 +147,7 @@
           </div>
 
           <div style="display: flex;" >
-            <el-popover placement="bottom" :width="100" trigger="click" :visible="setShow">
+            <el-popover class="needHide-Container" placement="bottom" :width="100" trigger="click" :visible="setShow">
               <template #reference>
                 <div v-if="props.type === 'grid' || props.type === 'json'">
                   <el-button  type="" key="plain"  text @click="setShow = true" >设置</el-button>

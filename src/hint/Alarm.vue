@@ -31,6 +31,7 @@
     cronId.value = infoId;
     let cronData:any = await invoke("get_cron_info", {id: infoId});
     title.value = cronData.content;
+    await appWindow.setTitle(cronData.name);
     runTime.value = cronData.update_time
   })
 

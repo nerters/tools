@@ -48,7 +48,16 @@
   const height = ref()
   const width = ref()
 
-
+  defineProps({
+      getCacheFile:{
+        type:Function,
+        default: () => null,
+      },
+      saveCacheFile:{
+        type:Function,
+        default: () => null,
+      },
+    })
 
   const resultImg = ref()
 

@@ -88,8 +88,9 @@ pub async fn init_mysql_pool(db_url: &str) {
         PRIMARY KEY ('id'),
         CONSTRAINT 'only' UNIQUE ('code' COLLATE BINARY ASC) ON CONFLICT FAIL
       );
-      
-      
+      INSERT INTO 'main'.'cron_title' ('id', 'name', 'content', 'cron_type', 'interval', 'appointed_time', 'is_use', 'pid', 'category', 'create_time', 'creator_lid', 'creator_name', 'updater_lid', 'updater_name', 'up_ver', 'sort', 'tenant_id', 'deleted', 'update_time') VALUES ('-1', '常规', '常规', 'interval', 1, 0, 0, '-2', 'type', 1713774603, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 1716454081);
+      INSERT INTO 'main'.'cron_title' ('id', 'name', 'content', 'cron_type', 'interval', 'appointed_time', 'is_use', 'pid', 'category', 'create_time', 'creator_lid', 'creator_name', 'updater_lid', 'updater_name', 'up_ver', 'sort', 'tenant_id', 'deleted', 'update_time') VALUES ('0', '默认', '默认', 'interval', 1, 0, 0, '-1', 'type', 1713774603, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 1716454328);
+
       ")
         .execute(&pool)
         .await;
