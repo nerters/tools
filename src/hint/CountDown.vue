@@ -10,7 +10,7 @@
         </div>
       </div>
       <div class="content" style="display: flex; align-items: center; padding-top: -5px;" data-tauri-drag-region>
-        <Countdown :deadline="runTime" countdownSize="2.5rem" showLabels="false" :showDays="showDay" />
+        <Countdown :deadline="runTime" countdownSize="2.5rem" :showLabels="false" :showDays="showDay" />
       </div>
 
         
@@ -19,24 +19,24 @@
   
   <script setup lang="ts">
   import { onMounted, ref } from 'vue';
-  import { getCurrent } from '@tauri-apps/api/window';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
   import { invoke } from '@tauri-apps/api/core';
   import {Countdown} from 'vue3-flip-countdown';
 
-  const appWindow = getCurrent();
+  const appWindow = getCurrentWindow();
 
   const title = ref("")
   const cronId = ref("")
-  const currentTime = ref(Date.now())
+  //const currentTime = ref(Date.now())
   const runTime = ref(timestampToTime(Date.now()));
   const showDay = ref(window.innerWidth > 300);
 
   
 
   // 每秒更新一次时间戳
-  setInterval(() => {
-    currentTime.value = Date.now();
-  }, 1000);
+  //setInterval(() => {
+  //  currentTime.value = Date.now();
+  //}, 1000);
 
   async function getData() {
     console.log("************")
@@ -57,7 +57,7 @@
 onMounted(async () => { 
     await getData();
 
-    await getCurrent().listen<any>("get_cron_info", (event) => {
+    await getCurrentWindow().listen<any>("get_cron_info", (event) => {
         let temp = event.payload;
         if (cronId.value === temp.id) {
           if (temp.cron_type === "interval") {

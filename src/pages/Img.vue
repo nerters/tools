@@ -39,7 +39,7 @@
   <script lang="ts" setup>
   import { ref } from 'vue'
   import { convertFileSrc } from '@tauri-apps/api/core';
-  import { FileResponse, open} from "@tauri-apps/plugin-dialog"
+  import { open } from "@tauri-apps/plugin-dialog"
   import { invoke } from "@tauri-apps/api/core";
   
   const imageUrl = ref()
@@ -62,13 +62,14 @@
   const resultImg = ref()
 
   const openFileInput = async () => {
-      const file:FileResponse[]|null = await open({
+
+      const file:string[] | null = await open({
         multiple: true,
         directory: false,
       });
       if (file) {
-        filePaht.value = file[0].path
-        imageUrl.value = convertFileSrc(file[0].path);
+        filePaht.value = file[0]
+        imageUrl.value = convertFileSrc(file[0]);
       }
   };
 

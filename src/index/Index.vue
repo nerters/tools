@@ -280,12 +280,15 @@ async function merge_data():Promise<any[]> {
             <div style="position: absolute; font-size: 8px; margin-top: -5px; margin-left: 3px ;" v-if="item.type === 'funPage'"> f </div>
             <div style="position: absolute; font-size: 8px; margin-top: -5px; margin-left: 3px ;" v-if="item.type === 'placeholder'"> p </div>
 
-            <div v-if="item.i.toString() === 'JSON'" style="text-align: center; " >
-              {{ item.i }}
+            <div>
+              <div v-if="item.i.toString() === 'JSON'" style="text-align: center; " >
+                {{ item.i }}
+              </div>
+              <div v-if="item.i.toString() != 'JSON'" style="text-align: center; " >{{ item.i }}</div>
+              <span class="update" v-if="editGridData" @click="exitItem(item.id)">0</span>
+              <span class="remove" v-if="editGridData" @click="removeItem(item.code)">x</span>
             </div>
-            <div v-if="item.i.toString() != 'JSON'" style="text-align: center; " >{{ item.i }}</div>
-            <span class="update" v-if="editGridData" @click="exitItem(item.id)">0</span>
-            <span class="remove" v-if="editGridData" @click="removeItem(item.code)">x</span>
+
             <div style="text-align: center; ">{{ item.desc }}</div>
         </grid-item>
     </grid-layout>

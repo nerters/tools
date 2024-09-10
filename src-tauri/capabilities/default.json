@@ -6,7 +6,8 @@
     "main",
     "dev-*",
     "countDown-*",
-    "floating-*"
+    "floating-*",
+    "tool-*"
   ],
   "remote": {
     "urls": [
@@ -15,23 +16,17 @@
     ]
   },
   "permissions": [
-    "path:default",
-    "event:default",
-    "window:default",
-    "window:allow-start-dragging",
-    "window:allow-minimize",
-    "window:allow-maximize",
-    "window:allow-toggle-maximize",
-    "window:allow-close",
-    "window:allow-create",
-    "window:allow-set-title",
-    "window:allow-available-monitors",
-    "app:default",
-    "resources:default",
-    "menu:default",
-    "tray:default",
-    "webview:allow-create-webview-window",
-    "webview:allow-create-webview",
+    "core:window:allow-cursor-position",
+    "core:window:allow-create",
+    "core:window:allow-close",
+    "core:window:allow-hide",
+    "core:window:allow-maximize",
+    "core:window:allow-minimize",
+    "core:window:allow-title",
+    "core:window:allow-set-title",
+    "core:window:allow-start-dragging",
+    "core:window:allow-toggle-maximize",
+    "core:event:allow-listen",
     "dialog:allow-open",
     "dialog:allow-save",
     "dialog:allow-message",
@@ -41,6 +36,7 @@
     "fs:allow-exists",
     "fs:allow-create",
     "shell:allow-open",
+    "clipboard-manager:allow-read-text",
     {
       "identifier": "fs:scope-appdata",
       "allow": [
@@ -54,11 +50,10 @@
         }
       ]
     },
-
     "fs:default",
     "dialog:default",
     "sql:default",
     "shell:default",
-    "shell:default"
+    "clipboard-manager:default"
   ]
 }

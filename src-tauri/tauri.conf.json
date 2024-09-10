@@ -1,16 +1,17 @@
 {
-  "productName": "practice",
-  "version": "0.0.0",
-  "identifier": "tk.tools",
+  "productName": "tools",
+  "version": "0.1.0",
+  "identifier": "com.tools.app",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
-  "app": {"windows": [
+  "app": {
+    "windows": [
       {
-        "title": "practice",
+        "title": "tools",
         "width": 800,
         "height": 600,
         "decorations": false,

@@ -5,8 +5,6 @@ use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use sqlx::{migrate::MigrateDatabase, sqlite::SqlitePoolOptions, Pool, Sqlite};
 
-
-
 // 创建一个全局的DB_POOL，可以一直使用，启动的时候初始化即可
 static DB_POOL: OnceCell<Pool<Sqlite>> = OnceCell::new();
 
@@ -34,8 +32,10 @@ pub async fn init_mysql_pool(db_url: &str) {
         std::fs::File::create(path.clone() + "\\" + db_url);
     }
 
-
-    let pool = SqlitePoolOptions::new().connect_lazy(&("sqlite:".to_string() + &path + "\\" + db_url)).ok().expect("链接失败");
+    let pool = SqlitePoolOptions::new()
+        .connect_lazy(&("sqlite:".to_string() + &path + "\\" + db_url))
+        .ok()
+        .expect("链接失败");
 
     // 执行一个 SQL 查询，例如创建一个表
     let _ = sqlx::query("CREATE TABLE IF NOT EXISTS 'cron_title' (
@@ -95,12 +95,12 @@ pub async fn init_mysql_pool(db_url: &str) {
         .execute(&pool)
         .await;
 
-
-    DB_POOL.set(pool).unwrap_or_else(|_| { println!("try insert pool cell failure!") });
+    DB_POOL
+        .set(pool)
+        .unwrap_or_else(|_| println!("try insert pool cell failure!"));
     // DB_POOL.set(mysql::Pool::new(db_url).expect(&format!("Error connecting to {}", &db_url)))
     //     .unwrap_or_else(|_| { info!("try insert pool cell failure!") });
     println!("初始化数据库线程池--------结束-------");
-
 }
 
 // 从链接链接池里面获取链接
@@ -114,7 +114,6 @@ pub fn get_connect() -> &'static Pool<Sqlite> {
 
 #[derive(Serialize, Deserialize)]
 pub struct Timer {
-    time:String,
+    time: String,
     id: i64,
 }
-

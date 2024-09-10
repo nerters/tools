@@ -4,9 +4,9 @@
     import clo from "../assets/mdi_close.svg";
     import max from "../assets/mdi_maximize.svg";
     import min from "../assets/mdi_minimize.svg";
-    import { getCurrent } from '@tauri-apps/api/window';
+    import { getCurrentWindow } from '@tauri-apps/api/window';
     import { useRouter } from "vue-router";
-    const appWindow = getCurrent();
+    const appWindow = getCurrentWindow();
     const router = useRouter();
 
     const emit = defineEmits(["addGrid", "editGrid"])

@@ -9,9 +9,9 @@
   
   <script setup lang="ts">
   import { onMounted, ref } from 'vue';
-  import { getCurrent } from '@tauri-apps/api/window';
+  import { getCurrentWindow } from '@tauri-apps/api/window';
   import { invoke } from '@tauri-apps/api/core';
-  const appWindow = getCurrent();
+  const appWindow = getCurrentWindow();
 
   const title = ref("")
   const cronId = ref("")
@@ -28,6 +28,7 @@
 
   onMounted(async () => { 
     let infoId = await appWindow.title();
+    console.log("id:" + infoId)
     cronId.value = infoId;
     let cronData:any = await invoke("get_cron_info", {id: infoId});
     title.value = cronData.content;

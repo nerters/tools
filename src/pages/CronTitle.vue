@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { onMounted, reactive, ref } from 'vue';
     import { invoke } from '@tauri-apps/api/core';
-    import { getCurrent } from '@tauri-apps/api/window';
+    import { getCurrentWindow } from '@tauri-apps/api/window';
     import { Container, Draggable } from "vue3-smooth-dnd"
 
     import { ask } from '@tauri-apps/plugin-dialog';
@@ -21,6 +21,8 @@
     const currentTime = ref(Date.now())
 
     const addCardData = ref(false);
+
+    const upCardData = ref(false);
 
     const isHovered = ref(false);
 
@@ -43,13 +45,38 @@
       pid: "",
     })
 
+
+    const upForm = reactive({
+      id: "",
+      name: '',
+      content: '',
+      cron_type: '',
+      interval: "0",
+      appointed_time:0,
+      is_use: "",
+      pid: "",
+      category: "",
+      create_time: "",
+      creator_lid: "",
+      creator_name: "",
+      updater_lid: "",
+      updater_name: "",
+      up_ver: "",
+      sort: "",
+      tenant_id: "",
+      deleted: "",
+      update_time: "",
+      children: [],
+    })
+
+
     // 每秒更新一次时间戳
     setInterval(async () => {
       currentTime.value = Date.now();
     }, 1000);
 
     onMounted(async () => { 
-        await getCurrent().listen<any>("get_cron_info", (event) => {
+        await getCurrentWindow().listen<any>("get_cron_info", (event) => {
           let temp = event.payload;
           const columnIndex = scene.children.map((item: { id: any; name: any; }) => item.id).indexOf(temp.pid);
           if (columnIndex < 0) {
@@ -94,6 +121,66 @@
             sizeForm.pid = "";
         }
     }
+
+
+    function upCard(data: any) {
+      console.log(data);
+      upCardData.value = !upCardData.value;
+      upForm.id = data.id;
+      upForm.name = data.name;
+      upForm.content = data.content;
+      upForm.cron_type = data.cron_type;
+      upForm.interval = data.interval;
+      upForm.appointed_time = data.appointed_time*1000;
+      upForm.is_use = data.is_use;
+      upForm.pid = data.pid;
+      upForm.category = data.category;
+      upForm.create_time = data.create_time;
+      upForm.creator_lid = data.creator_lid;
+      upForm.creator_name = data.creator_name;
+      upForm.updater_lid = data.update_time;
+      upForm.updater_name = data.updater_name;
+      upForm.up_ver = data.up_ver;
+      upForm.sort = data.sort;
+      upForm.tenant_id = data.tenant_id;
+      upForm.deleted = data.deleted;
+      upForm.update_time = data.update_time;
+      upForm.children = data.children;
+    }
+
+    async function upCardSubmit() {
+      if (upForm.name && (upForm.interval || upForm.appointed_time) && upForm.content) {
+
+        await invoke("update_cron", {id: upForm.id, name: upForm.name, content: upForm.content, interval: parseInt(upForm.interval), appointedTime: Math.floor(upForm.appointed_time/1000), 
+          pid: upForm.pid, sort: upForm.sort, category: upForm.category, isUse: upForm.is_use, cronType: upForm.cron_type});
+
+          scene.children = await invoke("get_tree_cron");
+          upCardData.value = !upCardData.value;
+          upCardData.value = false;
+          upForm.id = "";
+          upForm.name = '';
+          upForm.content = '';
+          upForm.cron_type = '';
+          upForm.interval = "0";
+          upForm.appointed_time = 0;
+          upForm.is_use = "";
+          upForm.pid = "";
+          upForm.category = "";
+          upForm.create_time = "";
+          upForm.creator_lid = "";
+          upForm.creator_name = "";
+          upForm.updater_lid = "";
+          upForm.updater_name = "";
+          upForm.up_ver = "";
+          upForm.sort = "";
+          upForm.tenant_id = "";
+          upForm.deleted = "";
+          upForm.update_time = "";
+          upForm.children = [];
+      }
+    }
+
+
 
     async function floatingWindow(dataId: string) {
       await invoke("floating_window", {id: dataId});
@@ -274,8 +361,6 @@
 </script>
 
 <template>
-
-
     <el-dialog v-model="addCardData" title="添加卡片" width="380">
       <el-form
           ref="form"
@@ -321,6 +406,56 @@
           <el-form-item>
             <el-button type="primary" @click="addCardSubmit">创建</el-button>
             <el-button @click="addCardData = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+    </el-dialog>
+
+
+    <el-dialog v-model="upCardData" title="更新卡片" width="380">
+      <el-form
+          ref="form"
+          style="max-width: 600px"
+          :model="sizeForm"
+          label-width="auto"
+          label-position="left"
+          size="small"
+        >
+          <el-form-item label="名称">
+            <el-input v-model="upForm.name" />
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input v-model="upForm.content" />
+          </el-form-item>
+
+          <el-form-item label="类型">
+            <el-select
+              v-model="upForm.cron_type"
+              placeholder="请选择"
+            >
+              <el-option label="时间间隔" value="interval" />
+              <el-option label="指定时间点" value="appointedTime" />
+            </el-select>
+          </el-form-item>
+
+          <div v-if="upForm.cron_type === 'interval'">
+            <el-form-item label="时间间隔">
+              <el-input v-model="upForm.interval" />
+            </el-form-item>
+          </div>
+          <div v-if="upForm.cron_type === 'appointedTime'">
+            <el-form-item label="指定时间点">
+              <el-date-picker
+                v-model="upForm.appointed_time"
+                type="datetime"
+                placeholder="Select date and time"
+              />
+             
+            </el-form-item>
+          </div>
+          
+          <el-form-item>
+            <el-button type="primary" @click="upCardSubmit">提交</el-button>
+            <el-button @click="upCardData = false">取消</el-button>
           </el-form-item>
         </el-form>
     </el-dialog>
@@ -410,16 +545,14 @@
                             <div class="cursor-move my-2 mx-4 rounded-lg shadow-md bg-gray-100 dark:bg-gray-800 hover:border-2 border-primary"  >
                               <div class="p-4 space-y-2" >
                                 <div style="width: 300px; font-size: 13px; height: 32px; box-shadow: var(--el-box-shadow-dark); padding-top: 5px;" shadow="hover" >
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-left: 5px; margin-right: 5px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-left: 5px; margin-right: 5px;" @dblclick="upCard(i)">
                                         <div style="width: 100px;">
-                                            {{ i.content }}
-                                         
+                                            {{ i.name }}
                                         </div>
-                                        <div v-if="i.is_use === 0 && i.cron_type ==='interval'" style="width: 100px;">
+                                        <div v-if="i.is_use === 0 && i.cron_type ==='interval'" style="width: 100px; font-size:12px">
                                           倒计时{{ i.interval - ((Math.floor(currentTime/1000)) - i.update_time) }} 秒
-                                          
                                         </div>
-                                        <div v-if="i.is_use === 0 && i.cron_type ==='appointedTime'" style="width: 100px;">
+                                        <div v-if="i.is_use === 0 && i.cron_type ==='appointedTime'" style="width: 100px; font-size:12px">
                                           倒计时{{ i.appointed_time - ((Math.floor(currentTime/1000))) }} 秒
                                         </div>
                                         <div v-if="i.is_use === 1" style="color: red; width: 100px;">

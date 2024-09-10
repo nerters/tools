@@ -6,6 +6,8 @@
   import { basicSetup } from 'codemirror';
   import { json } from "@codemirror/lang-json";
   import {MergeView} from "@codemirror/merge"
+  import { getCurrentWindow } from '@tauri-apps/api/window';
+  import { readText } from '@tauri-apps/plugin-clipboard-manager';
 
 
   const emit = defineEmits(["titleType"])
@@ -20,6 +22,7 @@
   const temp = ref("");
   const tableData:Ref<Array<{ [key: string]: any }>> = ref([{"te":"te"}]);
   const editorToMerge = ref(false);
+  const appWindow = getCurrentWindow();
 
   const props = defineProps({
     getCacheFile:{
@@ -33,15 +36,22 @@
   })
 
   onMounted(async () => { 
-      //判断默认文件是否存在
-      let data = await props.getCacheFile(cacheFileName);
-      console.log(data)
-      if (data) {
-          // 转成json字符串并格式化
-          temp.value = JSON.stringify(JSON.parse(data), null, '\t')
-          tableData.value[0] = JSON.parse(temp.value);
+      let title = await appWindow.title();
+      console.log(title)
+      if (title == "tool-Json") {
+        let conent = await readText();
+        temp.value = conent;
+      } else {
+        //判断默认文件是否存在
+        let data = await props.getCacheFile(cacheFileName);
+        console.log(data)
+        if (data && !tableData.value[0]) {
+            // 转成json字符串并格式化
+            temp.value = JSON.stringify(JSON.parse(data), null, '\t')
+            tableData.value[0] = JSON.parse(temp.value);
+        }
       }
-
+      
       initEditor();
       initMergeView();
       window.addEventListener('keypress', handleKeyPress);

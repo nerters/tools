@@ -1,13 +1,20 @@
-use dao::{cron::{self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP}, grid_info::{self, merge_data, GridInfo}};
+use dao::{
+    cron::{
+        self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP,
+    },
+    grid_info::{self, merge_data, GridInfo},
+};
 use idgen::IDGen;
-use tauri::Manager;
 use img::img_utils::compress;
+use tauri::{AppHandle, Emitter, Manager};
 use utils::{date_util::get_now_time_m, mysql_utils::init_mysql_pool};
+mod dao;
 mod img;
 mod json;
-mod dao;
 mod utils;
 
+#[cfg(desktop)]
+mod tray;
 
 #[tauri::command]
 fn compress_img(file_path: String, nwidth: u32, nheight: u32, img_type: String) -> String {
@@ -15,7 +22,15 @@ fn compress_img(file_path: String, nwidth: u32, nheight: u32, img_type: String) 
 }
 
 #[tauri::command]
-async fn savn_cron(name: String, content: String, cron_type: String, interval: i64, appointed_time: i64, category: String, pid: String) -> i64 {
+async fn savn_cron(
+    name: String,
+    content: String,
+    cron_type: String,
+    interval: i64,
+    appointed_time: i64,
+    category: String,
+    pid: String,
+) -> i64 {
     let idgen = IDGen::new(1);
     let id = idgen.new_id();
     let mut info = CronInfo::default();
@@ -36,7 +51,18 @@ async fn savn_cron(name: String, content: String, cron_type: String, interval: i
 }
 
 #[tauri::command]
-fn update_cron(id: String, name: String, content: String, interval: i64, appointed_time: i64, pid: String, sort: i16, category: String, is_use: i64, cron_type: String) {
+fn update_cron(
+    id: String,
+    name: String,
+    content: String,
+    interval: i64,
+    appointed_time: i64,
+    pid: String,
+    sort: i16,
+    category: String,
+    is_use: i64,
+    cron_type: String,
+) {
     let mut info = CronInfo::default();
     info.id = id;
     info.name = name;
@@ -62,24 +88,26 @@ async fn get_tree_cron() -> Vec<CronInfo> {
 }
 
 #[tauri::command]
-async fn del_cron(id : String) {
+async fn del_cron(id: String) {
     delete_by_id(id.clone()).await;
     let mut map = CRON_MAP.lock().await;
+    println!("删除id:{}", id.clone());
     map.remove(&id);
+    match serde_json::to_string(&map.clone()) {
+        Ok(x) => println!("删除后的数据:{}", x),
+        Err(_) => todo!(),
+    };
 }
-
-
 
 #[tauri::command]
 async fn open_docs(handle: tauri::AppHandle) {
     alert_win(handle.clone()).await;
 
     //floating_window(handle.clone()).await;
-
 }
 
 #[tauri::command]
-async fn use_cron(handle: tauri::AppHandle, id : String) {
+async fn use_cron(handle: tauri::AppHandle, id: String) {
     if !id.is_empty() {
         let mut map = CRON_MAP.lock().await;
         if let Some(temp) = map.get(&id) {
@@ -111,15 +139,17 @@ async fn use_cron(handle: tauri::AppHandle, id : String) {
     }
 }
 
-
 #[tauri::command]
-async fn get_cron_info(id : String) -> CronInfo {
+async fn get_cron_info(id: String) -> CronInfo {
+    println!("get_cron_info参数:{}", id);
     if !id.is_empty() {
         let map = CRON_MAP.lock().await;
         if let Some(temp) = map.get(&id) {
             let temp = temp.clone();
             println!("******{}", temp.update_time);
-            return temp;    
+            return temp;
+        } else {
+            println!("没有查询到{}", id);
         }
     }
     return CronInfo::default();
@@ -127,18 +157,17 @@ async fn get_cron_info(id : String) -> CronInfo {
 
 #[tauri::command]
 fn read_file(path: String) -> String {
-  println!("{}", path);
-  match file::get_text(path) {
-    Ok(text) => {
-      return text;
-    },
-    Err(e) => {
-      println!("获取数据失败！{}", e);
-      return format!("#@#error#@#_{}", e);
-  },
-  }
+    println!("{}", path);
+    match file::get_text(path) {
+        Ok(text) => {
+            return text;
+        }
+        Err(e) => {
+            println!("获取数据失败！{}", e);
+            return format!("#@#error#@#_{}", e);
+        }
+    }
 }
-
 
 #[tauri::command]
 async fn grid_merge_data(data_list: Vec<GridInfo>) -> Vec<GridInfo> {
@@ -146,9 +175,18 @@ async fn grid_merge_data(data_list: Vec<GridInfo>) -> Vec<GridInfo> {
     merge_data(data_list).await
 }
 
-
 #[tauri::command]
-async fn add_grid(name: String, describe: String, uri: String, code: String, classify: String, x: i64, y: i64, w: i64, h: i64) -> i64 {
+async fn add_grid(
+    name: String,
+    describe: String,
+    uri: String,
+    code: String,
+    classify: String,
+    x: i64,
+    y: i64,
+    w: i64,
+    h: i64,
+) -> i64 {
     let idgen = IDGen::new(1);
     let id = idgen.new_id();
     let mut info = GridInfo::default();
@@ -167,10 +205,19 @@ async fn add_grid(name: String, describe: String, uri: String, code: String, cla
     id as i64
 }
 
-
-
 #[tauri::command]
-async fn update_grid(id: String, name: String, describe: String, uri: String, code: String, classify: String, x: i64, y: i64, w: i64, h: i64) -> bool {
+async fn update_grid(
+    id: String,
+    name: String,
+    describe: String,
+    uri: String,
+    code: String,
+    classify: String,
+    x: i64,
+    y: i64,
+    w: i64,
+    h: i64,
+) -> bool {
     let mut info = GridInfo::default();
     info.id = id.to_string();
     info.name = name;
@@ -186,13 +233,10 @@ async fn update_grid(id: String, name: String, describe: String, uri: String, co
     grid_info::update(info).await
 }
 
-
-
 #[tauri::command]
 async fn delete_grid_by_id(id: String) {
     grid_info::delete_by_id(id).await;
 }
-
 
 #[tauri::command]
 async fn get_grid_by_id(id: String) -> GridInfo {
@@ -207,73 +251,125 @@ async fn floating_window(handle: tauri::AppHandle, id: String) {
     let mut width = 288.0;
     let map = CRON_MAP.lock().await;
     if let Some(temp) = map.get(&id) {
-        
         win_key += &temp.id.clone();
         info_id += &temp.id.clone();
         if temp.category != "cron" {
-            return ;
+            return;
         }
         if temp.interval > 86400 || temp.appointed_time - get_now_time_m() > 86400 {
             width = 388.0;
         }
     }
 
-    
     if let Some(_win) = handle.get_webview_window(&win_key) {
         println!("窗口已启动!");
     } else {
+        let win_list = handle.webview_windows();
+        let mut win_num = 0;
+        for (key, _value) in win_list {
+            if key.starts_with("countDown") {
+                win_num += 1;
+            }
+        }
         let docs_window = tauri::WebviewWindowBuilder::new(
             &handle,
             win_key, /* the unique window label */
-            tauri::WebviewUrl::App("/hint/CountDown".parse().unwrap())
-          ).title(info_id)
-          .inner_size(width, height)
-          .decorations(false)
-          .transparent(true)
-          .position(800.0,100.0)
-          .build();
-    
+            tauri::WebviewUrl::App("/hint/CountDown".parse().unwrap()),
+        )
+        .title(info_id)
+        .inner_size(width, height)
+        .decorations(false)
+        .transparent(true)
+        .resizable(false)
+        .position(800.0, 100.0 + (win_num as f64) * 100.0)
+        .build();
+
         match docs_window {
             Ok(win) => {
                 let _ = win.set_always_on_top(true);
-            },
+            }
             Err(_) => {
                 println!("启动窗口失败!");
-            }, 
+            }
         }
     }
 }
 
-
-
-
 #[tokio::main]
 async fn init() {
-  //init_mysql_pool("mysql://账号:密码@数据库地址/数据库");
-  init_mysql_pool("mydatabase.db").await;
+    //init_mysql_pool("mysql://账号:密码@数据库地址/数据库");
+    init_mysql_pool("mydatabase.db").await;
+}
+
+fn show_window(app: &AppHandle) {
+    match app.get_webview_window("main") {
+        Some(win) => {
+            let _ = win.show();
+        }
+        None => {
+            let window = app.webview_windows();
+            window
+                .values()
+                .next()
+                .expect("Sorry, no window found")
+                .set_focus()
+                .expect("Can't Bring Window to Focus");
+        }
+    };
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    
     init();
     tauri::Builder::default()
+        .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let _ = show_window(app);
+        }))
         .plugin(tauri_plugin_sql::Builder::new().build())
-        .setup(|app|{
+        .setup(|app| {
             let mainwindow = app.get_webview_window("main").unwrap();
             let _ = mainwindow.show();
+
+            #[cfg(all(desktop))]
+            {
+                let handle = app.handle();
+                tray::create_tray(handle)?;
+            }
+
             Ok(())
         })
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![compress_img, open_docs,savn_cron, update_cron, 
-            del_cron, get_list_cron, use_cron, read_file, get_cron_info, grid_merge_data, add_grid, 
-            update_grid, delete_grid_by_id, get_grid_by_id, floating_window, get_tree_cron])
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                let label = window.label();
+                if (label.eq("main")) {
+                    api.prevent_close();
+                    let _ = window.hide();
+                }
+            }
+            _ => {}
+        })
+        .invoke_handler(tauri::generate_handler![
+            compress_img,
+            open_docs,
+            savn_cron,
+            update_cron,
+            del_cron,
+            get_list_cron,
+            use_cron,
+            read_file,
+            get_cron_info,
+            grid_merge_data,
+            add_grid,
+            update_grid,
+            delete_grid_by_id,
+            get_grid_by_id,
+            floating_window,
+            get_tree_cron
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-
-
-
-   
 }
