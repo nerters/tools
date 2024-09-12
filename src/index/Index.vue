@@ -142,7 +142,7 @@ const gridForm = reactive({
 
 watch(addGridData, async () => {
   if (addGridData.value) {
-    await addItem(addGridData.value.name, addGridData.value.desc, addGridData.value.code)
+    await addItem(addGridData.value.name, addGridData.value.desc, addGridData.value.code, addGridData.value.uri, addGridData.value.classify)
   }
 })
 
@@ -153,11 +153,11 @@ watch(editGridData, async () => {
   }
 })
 
-async function addItem(name: String, desc: String, code: String) {
+async function addItem(name: String, desc: String, code: String, uri: String, classify: String) {
     // Add a new item. It must have a unique key!
     let x = (layout.value.length * 2) % (colNum.value || 12);
     let y = layout.value.length + (colNum.value || 12);
-    let dataId = await invoke("add_grid", {name: name, describe: desc, uri: "", code: code?code:name, classify: "", x: x, y: y, w: 2, h: 2 });
+    let dataId = await invoke("add_grid", {name: name, describe: desc, uri: uri, code: code?code:name, classify: classify, x: x, y: y, w: 2, h: 2 });
     layout.value.push({
         x: x,
         y: y, // puts it at the bottom
@@ -330,11 +330,11 @@ async function merge_data():Promise<any[]> {
           <el-input v-model="gridForm.gridUri" />
         </el-form-item>
       </div>
-      <div v-if="gridForm.gridType === 'funPage'">
+      <!-- <div v-if="gridForm.gridType === 'funPage'">
         <el-form-item label="网址123">
           <el-input v-model="gridForm.gridUri" />
         </el-form-item>
-      </div>
+      </div> -->
       
       <el-form-item>
         <el-button type="primary" @click="updateGrid()">更新</el-button>

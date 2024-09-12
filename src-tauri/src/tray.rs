@@ -81,6 +81,7 @@ pub fn open_web<R: Runtime>(app: &tauri::AppHandle<R>, path: String) {
     .title(("tool-".to_string() + path.as_str()))
     .inner_size(800.0, 600.0)
     .decorations(false)
+    .focused(true)
     .position(500.0, 400.0)
     .build();
     match docs_window {

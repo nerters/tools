@@ -67,6 +67,15 @@ const routes: Array<RouteRecordRaw> = [
                 title: 'CronTitle'
               },
               component:()=>import('../pages/CronTitle.vue')
+          },
+          {
+            //路由初始指向
+              path: 'HotKey',
+              name: 'HotKey',
+              meta: {
+                title: 'HotKey'
+              },
+              component:()=>import('../pages/HotKey.vue')
           }
         ,
         {

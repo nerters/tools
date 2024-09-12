@@ -2,7 +2,7 @@ use dao::{
     cron::{
         self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP,
     },
-    grid_info::{self, merge_data, GridInfo},
+    grid_info::{self, merge_data, GridInfo}, hot_key::{self, HotKey},
 };
 use idgen::IDGen;
 use img::img_utils::compress;
@@ -15,6 +15,8 @@ mod utils;
 
 #[cfg(desktop)]
 mod tray;
+#[cfg(desktop)]
+mod hotKey;
 
 #[tauri::command]
 fn compress_img(file_path: String, nwidth: u32, nheight: u32, img_type: String) -> String {
@@ -295,6 +297,66 @@ async fn floating_window(handle: tauri::AppHandle, id: String) {
     }
 }
 
+#[tauri::command]
+fn get_hot_key_list() -> Vec<HotKey> {
+   
+    hot_key::get_list()
+}
+
+#[tauri::command]
+fn add_hot_key(handle: tauri::AppHandle, key: String, path: String, desc: String, overopen: i64, url: String) {
+    let mut info = HotKey::default();
+    let idgen = IDGen::new(1);
+    let id = idgen.new_id();
+    info.id = id.to_string();
+    info.key = key;
+    info.path = path;
+    info.desc = desc;
+    info.url = url;
+    info.overopen = overopen;
+    let _ = hot_key::save(info.clone());
+    #[cfg(all(desktop))]
+    {
+        let _ = hotKey::add_host_key(&handle, info);
+
+        let _ = hotKey::create_host_key(&handle);
+    }
+}
+
+#[tauri::command]
+fn update_hot_key(handle: tauri::AppHandle, id: String, key: String, path: String, desc: String, overopen: i64, url: String) {
+    let mut info = HotKey::default();
+    info.id = id;
+    info.key = key;
+    info.path = path;
+    info.desc = desc;
+    info.url = url;
+    info.overopen = overopen;
+    let _ = hot_key::update(info);
+    #[cfg(all(desktop))]
+    {
+        let _ = hotKey::create_host_key(&handle);
+    }
+}
+
+#[tauri::command]
+fn delete_hot_key(handle: tauri::AppHandle, id: String) {
+    println!("111");
+    let _ = hot_key::delete_by_id(id);
+    #[cfg(all(desktop))]
+    {
+        if handle.remove_plugin("global-shortcut")  {
+            println!("成功global-shortcut");
+        } else {
+            println!("失败global-shortcut");
+        }  
+
+        let _ = hotKey::create_host_key(&handle); 
+    }
+
+}
+
+
 #[tokio::main]
 async fn init() {
     //init_mysql_pool("mysql://账号:密码@数据库地址/数据库");
@@ -335,6 +397,7 @@ pub fn run() {
             {
                 let handle = app.handle();
                 tray::create_tray(handle)?;
+                hotKey::create_host_key(handle)?;
             }
 
             Ok(())
@@ -345,7 +408,7 @@ pub fn run() {
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 let label = window.label();
-                if (label.eq("main")) {
+                if label.eq("main") {
                     api.prevent_close();
                     let _ = window.hide();
                 }
@@ -368,7 +431,11 @@ pub fn run() {
             delete_grid_by_id,
             get_grid_by_id,
             floating_window,
-            get_tree_cron
+            get_tree_cron,
+            get_hot_key_list,
+            add_hot_key,
+            update_hot_key,
+            delete_hot_key
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

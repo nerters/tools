@@ -48,7 +48,7 @@
 
     function addGridSubmit() {
       if (sizeForm.gridName && sizeForm.gridCode) {
-        emit("addGrid", {name: sizeForm.gridName, desc: sizeForm.gridDesc, code: sizeForm.gridCode});
+        emit("addGrid", {name: sizeForm.gridName, desc: sizeForm.gridDesc, code: sizeForm.gridCode, uri: sizeForm.gridUri, classify: sizeForm.gridType});
         addGridData.value = false;
         sizeForm.gridName = "";
         sizeForm.gridDesc = "";
@@ -238,11 +238,11 @@
               <el-input v-model="sizeForm.gridUri" />
             </el-form-item>
           </div>
-          <div v-if="sizeForm.gridType === 'funPage'">
+          <!-- <div v-if="sizeForm.gridType === 'funPage'">
             <el-form-item label="网址123">
               <el-input v-model="sizeForm.gridUri" />
             </el-form-item>
-          </div>
+          </div> -->
 
           <div v-if="sizeForm.gridType === 'funPage1'">
 

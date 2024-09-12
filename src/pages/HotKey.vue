@@ -1,0 +1,303 @@
+<script setup lang="ts">
+
+import { onMounted, reactive, ref } from 'vue';
+import { invoke } from '@tauri-apps/api/core';
+
+const tableData = ref([]);
+const updateData = ref(false);
+const addData = ref(false);
+
+const sizeForm = reactive({
+      id: '',
+      key: '',
+      key1: '',
+      key2: '',
+      path: '',
+      url: '',
+      desc: '',
+      overopen: '0',
+    })
+
+onMounted(async () => { 
+    tableData.value = await invoke("get_hot_key_list");
+    console.log( tableData.value)
+})
+
+async function update() {
+    await invoke("update_hot_key",{id: sizeForm.id, path: sizeForm.path, key: sizeForm.key1 + "+" + sizeForm.key2, desc: sizeForm.desc, overopen: parseInt(sizeForm.overopen.toString()), url: sizeForm.url});
+    sizeForm.id = '';
+    sizeForm.key = '';
+    sizeForm.path = '';
+    sizeForm.key1 = '';
+    sizeForm.key2 = '';
+    sizeForm.desc = '';
+    sizeForm.url = '';
+    sizeForm.overopen = '0';
+    //刷新
+    tableData.value = await invoke("get_hot_key_list");
+    updateData.value = false;
+}
+
+async function add() {
+    console.log("==")
+    await invoke("add_hot_key",{path: sizeForm.path, key: sizeForm.key1 + "+" + sizeForm.key2, desc: sizeForm.desc, overopen: parseInt(sizeForm.overopen.toString()), url: sizeForm.url});
+    sizeForm.id = '';
+    sizeForm.key = '';
+    sizeForm.path = '';
+    sizeForm.key1 = '';
+    sizeForm.key2 = '';
+    sizeForm.desc = '';
+    sizeForm.url = '';
+    sizeForm.overopen = '0';
+    //刷新
+    tableData.value = await invoke("get_hot_key_list");
+    addData.value = false;
+}
+
+async function del(id: String) {
+    console.log("--")
+    await invoke("delete_hot_key",{id: id,});
+    //刷新
+    tableData.value = await invoke("get_hot_key_list");
+}
+
+
+
+</script>
+<template>
+
+  <el-table :data="tableData" stripe style="width: 100%" @row-dblclick="(row: any, _column: any, _event: Event) => {
+    updateData = true;
+    sizeForm.id = row.id;
+    sizeForm.key = row.key;
+    sizeForm.path = row.path;
+    sizeForm.key1 = row.key1;
+    sizeForm.key2 = row.key2;
+    sizeForm.desc = row.desc;
+    sizeForm.url = row.url;
+    sizeForm.overopen = row.overopen.toString();
+    }">
+
+    <el-table-column prop="key" label="快捷键" width="180" />
+    <el-table-column prop="path" label="功能" width="180" />
+    <el-table-column prop="desc" label="描述" />
+    <el-table-column prop="overopen" label="功能页多开" >
+      <template #default="scope">
+        <span v-if="scope.row.overopen == 1">开启</span>
+        <span v-if="scope.row.overopen == 0">关闭</span>
+      </template>
+    </el-table-column>
+
+    <el-table-column align="right">
+      <template #header>
+        <el-button
+          size="small"
+        
+          @click="addData = true"
+        >
+          新增
+        </el-button>
+      </template>
+      <template #default="scope">
+        <el-button
+          size="small"
+          type="danger"
+          @click="del(scope.row.id)"
+        >
+          删除
+        </el-button>
+      </template>
+    </el-table-column>
+    
+  </el-table>
+
+
+  <el-dialog v-model="updateData" title="更新卡片" width="380">
+
+    <el-form
+    ref="form"
+    style="max-width: 600px"
+    :model="sizeForm"
+    label-width="auto"
+    label-position="left"
+    size="small"
+    >
+    <el-form-item label="快捷键">
+  
+        <el-row :gutter="50">
+          <el-col :span="12">
+            <el-select
+              v-model="sizeForm.key1"
+              placeholder="请选择"
+              style="width: 125px;"
+              >
+              <el-option label="shift+ctrl" value="shift+control" />
+            </el-select>
+          </el-col>
+          <el-col :span="12">
+            <el-select
+              v-model="sizeForm.key2"
+              placeholder="请选择"
+              style="width: 125px;"
+              >
+              <el-option label="1" value="Digit1" />
+              <el-option label="2" value="Digit2" />
+              <el-option label="3" value="Digit3" />
+              <el-option label="4" value="Digit4" />
+              <el-option label="5" value="Digit5" />
+              <el-option label="6" value="Digit6" />
+              <el-option label="7" value="Digit7" />
+              <el-option label="8" value="Digit8" />
+              <el-option label="9" value="Digit9" />
+              <el-option label="A" value="KeyA" />
+              <el-option label="B" value="KeyB" />
+              <el-option label="C" value="KeyC" />
+              <el-option label="D" value="KeyD" />
+              <el-option label="E" value="KeyE" />
+              <el-option label="F" value="KeyF" />
+              <el-option label="G" value="KeyG" />
+              <el-option label="H" value="KeyH" />
+              <el-option label="I" value="KeyI" />
+            </el-select>
+          </el-col>
+        </el-row>
+
+    </el-form-item>
+    <el-form-item label="功能">
+        <el-select
+          v-model="sizeForm.path"
+          placeholder="请选择"
+          >
+          <el-option label="JSON" value="Json" />
+          <el-option label="RSA密码" value="RsaPage" />
+          <el-option label="定时器" value="CronTitle" />
+
+          <el-option label="打开网址" value="webPage" />
+        </el-select>
+    </el-form-item>
+
+    <el-form-item v-if="sizeForm.path == 'webPage'" label="网址">
+        <el-input v-model="sizeForm.url" />
+    </el-form-item>
+
+    <el-form-item label="描述">
+        <el-input v-model="sizeForm.desc" />
+    </el-form-item>
+
+    <el-form-item label="功能页多开">
+        <el-select
+        v-model="sizeForm.overopen"
+        placeholder="请选择"
+        >
+        <el-option label="开启" value="1" />
+        <el-option label="关闭" value="0" />
+        </el-select>
+    </el-form-item>
+   
+
+    
+    <el-form-item>
+        <el-button type="primary" @click="update()">更新</el-button>
+        <el-button @click="updateData = false">取消</el-button>
+    </el-form-item>
+    </el-form>
+
+  </el-dialog>
+
+
+    <el-dialog v-model="addData" title="新增卡片" width="380">
+
+        <el-form
+        ref="form"
+        style="max-width: 600px"
+        :model="sizeForm"
+        label-width="auto"
+        label-position="left"
+        size="small"
+        >
+        <el-form-item label="快捷键">
+          <el-row :gutter="50">
+            <el-col :span="12">
+              <el-select
+                v-model="sizeForm.key1"
+                placeholder="请选择"
+                style="width: 125px;"
+                >
+                <el-option label="shift+ctrl" value="shift+control" />
+              </el-select>
+            </el-col>
+            <el-col :span="12">
+              <el-select
+                v-model="sizeForm.key2"
+                placeholder="请选择"
+                style="width: 125px;"
+                >
+                <el-option label="1" value="Digit1" />
+                <el-option label="2" value="Digit2" />
+                <el-option label="3" value="Digit3" />
+                <el-option label="4" value="Digit4" />
+                <el-option label="5" value="Digit5" />
+                <el-option label="6" value="Digit6" />
+                <el-option label="7" value="Digit7" />
+                <el-option label="8" value="Digit8" />
+                <el-option label="9" value="Digit9" />
+                <el-option label="A" value="KeyA" />
+                <el-option label="B" value="KeyB" />
+                <el-option label="C" value="KeyC" />
+                <el-option label="D" value="KeyD" />
+                <el-option label="E" value="KeyE" />
+                <el-option label="F" value="KeyF" />
+                <el-option label="G" value="KeyG" />
+                <el-option label="H" value="KeyH" />
+                <el-option label="I" value="KeyI" />
+              </el-select>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item label="功能">
+            <el-select
+              v-model="sizeForm.path"
+              placeholder="请选择"
+              >
+              <el-option label="JSON" value="Json" />
+              <el-option label="RSA密码" value="RsaPage" />
+              <el-option label="定时器" value="CronTitle" />
+
+              <el-option label="打开网址" value="webPage" />
+            </el-select>
+        </el-form-item>
+
+        <el-form-item v-if="sizeForm.path == 'webPage'" label="网址">
+            <el-input v-model="sizeForm.url" />
+        </el-form-item>
+
+        <el-form-item label="描述">
+            <el-input v-model="sizeForm.desc" />
+        </el-form-item>
+
+        <el-form-item label="功能页多开">
+            <el-select
+            v-model="sizeForm.overopen"
+            placeholder="请选择"
+            >
+            <el-option label="开启" value="1" />
+            <el-option label="关闭" value="0" />
+            </el-select>
+        </el-form-item>
+
+
+
+        <el-form-item>
+            <el-button type="primary" @click="add()">新增</el-button>
+            <el-button @click="addData = false">取消</el-button>
+        </el-form-item>
+        </el-form>
+
+    </el-dialog>
+
+
+</template>
+
+<style>
+
+</style>
