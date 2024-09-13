@@ -170,6 +170,7 @@ onMounted(async () => {
         editableTabs.value = JSON.parse(data);
         if (editableTabs.value.length > 0) {
             editableTabsValue.value = editableTabs.value[0].name;
+            tabLen = editableTabs.value.length
         }
         console.log(editableTabs.value.length);
     } else {
