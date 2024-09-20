@@ -33,6 +33,7 @@ pub struct CronInfo {
     pub is_use: i64,
     pub pid: String,
     pub category: String,
+    pub activity: i64,
 
     pub create_time: i64,
     pub creator_lid: String,
@@ -60,6 +61,7 @@ impl Default for CronInfo {
             is_use: 0,
             pid: String::from(""),
             category: String::from(""),
+            activity: 1,
 
             create_time: 0,
             creator_lid: String::from(""),
@@ -87,11 +89,11 @@ pub async fn get_list() -> Vec<CronInfo> {
         .acquire()
         .await
         .expect("Error get_connect from db pool");
-    let rust = sqlx::query("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category from cron_title")
+    let rust = sqlx::query("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category, activity from cron_title")
     .map(|row: SqliteRow| {
         CronInfo{ id: row.get(0), name: row.get(1), content: row.get(2), interval: row.get(3), appointed_time: row.get(4), create_time: row.get(5), 
             creator_lid: String::from(""), creator_name: String::from(""), updater_lid: String::from(""), updater_name: String::from(""), up_ver: 0, sort: 0, tenant_id: 0, deleted: 0, 
-            update_time: row.get(6), is_use:row.get(7), cron_type:row.get(8), pid:row.get(9), category:row.get(10), children:vec![]}
+            update_time: row.get(6), is_use:row.get(7), cron_type:row.get(8), pid:row.get(9), category:row.get(10), children:vec![], activity: row.get(11)}
     })
     .fetch_all(&mut conn.detach())
     .await;
@@ -123,11 +125,11 @@ pub async fn get_list_by_pid_and_category(pid: String, category: String) -> Vec<
     if !params.is_empty() {
         param += &("where ".to_string() + &params.join(" and "));
     }
-    let type_list = sqlx::query(&("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category from cron_title ".to_string() + &param))
+    let type_list = sqlx::query(&("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category, activity from cron_title ".to_string() + &param))
     .map(|row: SqliteRow| {
         CronInfo{ id: row.get(0), name: row.get(1), content: row.get(2), interval: row.get(3), appointed_time: row.get(4), create_time: row.get(5), 
             creator_lid: String::from(""), creator_name: String::from(""), updater_lid: String::from(""), updater_name: String::from(""), up_ver: 0, sort: 0, tenant_id: 0, deleted: 0, 
-            update_time: row.get(6), is_use:row.get(7), cron_type:row.get(8), pid:row.get(9), category:row.get(10), children:vec![]}
+            update_time: row.get(6), is_use:row.get(7), cron_type:row.get(8), pid:row.get(9), category:row.get(10), children:vec![], activity: row.get(11)}
     })
     .fetch_all(&mut conn.detach())
     .await;
@@ -166,11 +168,11 @@ pub async fn get_list_tokio() -> Vec<CronInfo> {
         .acquire()
         .await
         .expect("Error get_connect from db pool");
-    let rust = sqlx::query("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category from cron_title")
+    let rust = sqlx::query("select id, name, content, interval, appointed_time, create_time, update_time, is_use, cron_type, pid, category, activity from cron_title")
     .map(|row: SqliteRow| {
         CronInfo{ id: row.get(0), name: row.get(1), content: row.get(2), interval: row.get(3), appointed_time: row.get(4), create_time: row.get(5), 
             creator_lid: String::from(""), creator_name: String::from(""), updater_lid: String::from(""), updater_name: String::from(""), up_ver: 0, sort: 0, tenant_id: 0, deleted: 0, update_time: row.get(6),
-             is_use:row.get(7), cron_type:row.get(8), pid:row.get(9), category:row.get(10), children:vec![]}
+             is_use:row.get(7), cron_type:row.get(8), pid:row.get(9), category:row.get(10), children:vec![], activity: row.get(11)}
     })
     .fetch_all(&mut conn.detach())
     .await;
@@ -192,9 +194,9 @@ pub async fn save(info: CronInfo) -> bool {
         .await
         .expect("Error get_connect from db pool");
     let now = get_now_time_m();
-    let result = sqlx::query("insert into cron_title (id, name, content, interval, cron_type, appointed_time, is_use, pid, category, create_time, update_time, deleted) values (?,?,?,?,?,?,?,?,?,?,?,?)")
+    let result = sqlx::query("insert into cron_title (id, name, content, interval, cron_type, appointed_time, is_use, pid, category, create_time, update_time, deleted, activity) values (?,?,?,?,?,?,?,?,?,?,?,?,?)")
     .bind(info.id).bind(info.name).bind(info.content).bind(info.interval).bind(info.cron_type).bind(info.appointed_time).bind(info.is_use).bind(info.pid)
-    .bind(info.category).bind(now).bind(now).bind(0)
+    .bind(info.category).bind(now).bind(now).bind(0).bind(info.activity)
     .execute(&mut conn.detach())
     .await;
 
@@ -217,8 +219,8 @@ pub async fn update_tokio(info: CronInfo) -> bool {
         .acquire()
         .await
         .expect("Error get_connect from db pool");
-    let result = sqlx::query("UPDATE cron_title SET content = ?,interval=?, cron_type=?,appointed_time=?,update_time=?,is_use=?,pid=?,category=?, sort=?  where id = ?")
-    .bind(info.content).bind(info.interval).bind(info.cron_type).bind(info.appointed_time).bind(get_now_time_m()).bind(info.is_use).bind(info.pid).bind(info.category).bind(info.sort).bind(info.id)
+    let result = sqlx::query("UPDATE cron_title SET content = ?,interval=?, cron_type=?,appointed_time=?,update_time=?,is_use=?,pid=?,category=?, sort=?, activity=?  where id = ?")
+    .bind(info.content).bind(info.interval).bind(info.cron_type).bind(info.appointed_time).bind(get_now_time_m()).bind(info.is_use).bind(info.pid).bind(info.category).bind(info.sort).bind(info.activity).bind(info.id)
     .execute(&mut conn.detach())
     .await;
 
@@ -260,13 +262,39 @@ pub async fn update_use_tokio(info: CronInfo) -> bool {
     }
 }
 
+
+pub async fn stop_cron(info: CronInfo) -> bool {
+    let conn = get_connect()
+        .acquire()
+        .await
+        .expect("Error get_connect from db pool");
+    let result = sqlx::query("UPDATE cron_title SET update_time=?,activity=?  where id = ?")
+        .bind(info.update_time)
+        .bind(info.activity)
+        .bind(info.id)
+        .execute(&mut conn.detach())
+        .await;
+
+    match result {
+        Ok(_) => {
+            println!("创建数据成功");
+            return true;
+        }
+        Err(e) => {
+            println!("{}", e);
+            println!("创建数据失败");
+            return false;
+        }
+    }
+}
+
 pub async fn update(info: CronInfo) -> bool {
     let conn = get_connect()
         .acquire()
         .await
         .expect("Error get_connect from db pool");
-    let result = sqlx::query("UPDATE cron_title SET content = ?,interval=?, cron_type=?,appointed_time=?,update_time=?,is_use=?,pid=?,category=?  where id = ?")
-    .bind(info.content).bind(info.interval).bind(info.cron_type).bind(info.appointed_time).bind(info.update_time).bind(info.is_use).bind(info.pid).bind(info.category).bind(info.id)
+    let result = sqlx::query("UPDATE cron_title SET content = ?,interval=?, cron_type=?,appointed_time=?,update_time=?,is_use=?,pid=?,category=?, activity=?  where id = ?")
+    .bind(info.content).bind(info.interval).bind(info.cron_type).bind(info.appointed_time).bind(info.update_time).bind(info.is_use).bind(info.pid).bind(info.category).bind(info.activity).bind(info.id)
     .execute(&mut conn.detach())
     .await;
 
@@ -336,11 +364,11 @@ pub async fn alert_win(handle: tauri::AppHandle) {
             //获取缓存中的值
             let list = get_list_cache().await;
             for i in list.iter() {
-                if i.is_use == 1
+                if i.activity == 1 && (i.is_use == 1
                     || (i.cron_type == "interval"
                         && i.is_use == 0
                         && i.interval + i.update_time < now)
-                    || (i.cron_type == "appointedTime" && i.is_use == 0 && i.appointed_time < now)
+                    || (i.cron_type == "appointedTime" && i.is_use == 0 && i.appointed_time < now))
                 {
                     new_win(handle.clone(), i.clone()).await;
                 }

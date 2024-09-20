@@ -1,6 +1,6 @@
 use dao::{
     cron::{
-        self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP,
+        self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP
     },
     grid_info::{self, merge_data, GridInfo}, hot_key::{self, HotKey},
 };
@@ -140,6 +140,44 @@ async fn use_cron(handle: tauri::AppHandle, id: String) {
         update_use_tokio(info).await;
     }
 }
+
+
+#[tauri::command]
+async fn stop_cron(handle: tauri::AppHandle, id: String) {
+    if !id.is_empty() {
+        let mut map = CRON_MAP.lock().await;
+        if let Some(temp) = map.get(&id) {
+            let mut temp = temp.clone();
+            temp.update_time = get_now_time_m();
+            temp.activity = 0;
+            map.insert(id.clone(), temp.clone());
+
+            let mut win_key = "countDown-".to_string() + &id.clone();
+
+            if let Some(window) = handle.get_webview_window("main") {
+                //let list: Vec<CronInfo> = map.values().cloned().collect();
+                //window.emit("get_list_cron", list).unwrap();
+                window.emit("get_cron_info", temp.clone()).unwrap();
+            }
+
+            if let Some(window) = handle.get_webview_window(&win_key) {
+                //let list: Vec<CronInfo> = map.values().cloned().collect();
+                //window.emit("get_list_cron", list).unwrap();
+                window.emit("get_cron_info", temp).unwrap();
+            }
+        }
+        //更新数据库
+        let mut info = CronInfo::default();
+        info.id = id;
+        info.activity = 0;
+        info.update_time = get_now_time_m();
+        cron::stop_cron(info).await;
+    }
+}
+
+
+
+
 
 #[tauri::command]
 async fn get_cron_info(id: String) -> CronInfo {
@@ -419,6 +457,7 @@ pub fn run() {
             compress_img,
             open_docs,
             savn_cron,
+            stop_cron,
             update_cron,
             del_cron,
             get_list_cron,

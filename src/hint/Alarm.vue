@@ -5,6 +5,15 @@
       <p>已经触发{{ ((Math.floor(currentTime/1000)) - runTime) }} 秒</p>
     </div>
   </div>
+  <div v-if="cronType == 'appointedTime'" style="position: fixed; top: -4px; right: 5px;">
+      <el-button
+          size="small"
+        
+          @click="stopCron()"
+        >
+          停止
+        </el-button>
+    </div>
 </template>
   
   <script setup lang="ts">
@@ -15,6 +24,7 @@
 
   const title = ref("")
   const cronId = ref("")
+  const cronType = ref("interval")
 
 
   const currentTime = ref(Date.now())
@@ -32,6 +42,8 @@
     cronId.value = infoId;
     let cronData:any = await invoke("get_cron_info", {id: infoId});
     title.value = cronData.content;
+    cronType.value = cronData.cron_type
+    console.log("cronType:" + cronType.value)
     await appWindow.setTitle(cronData.name);
     runTime.value = cronData.update_time
   })
@@ -41,6 +53,11 @@
       appWindow.close()
       await invoke("use_cron", {id: cronId.value});
       //appWindow.emit("ref_cron_list", true);
+  }
+
+  async function stopCron() {
+    appWindow.close()
+    await invoke("stop_cron", {id: cronId.value});
   }
 
 

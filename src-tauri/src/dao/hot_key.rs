@@ -1,4 +1,3 @@
-
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use sqlx::{sqlite::SqliteRow, Row};

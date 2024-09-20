@@ -54,6 +54,7 @@
       interval: "0",
       appointed_time:0,
       is_use: "",
+      activity: 1,
       pid: "",
       category: "",
       create_time: "",
@@ -97,6 +98,7 @@
           }
         });
         scene.children = await invoke("get_tree_cron");
+        console.log(scene.children)
     })
 
     function addCard(category: string, pid: string) {
@@ -164,6 +166,7 @@
           upForm.interval = "0";
           upForm.appointed_time = 0;
           upForm.is_use = "";
+          upForm.activity = 1;
           upForm.pid = "";
           upForm.category = "";
           upForm.create_time = "";
@@ -199,6 +202,7 @@
         if (answer) {
           await invoke("del_cron", {id: dataId});
           scene.children = await invoke("get_tree_cron");
+       
         }
       }
     }
@@ -281,6 +285,7 @@
                   pid:"1",
                   content:"",
                   is_use:0,
+                  activity:1,
                   cron_type:"",
                   interval:0,
                   update_time:0,
@@ -549,10 +554,14 @@
                                         <div style="width: 100px;">
                                             {{ i.name }}
                                         </div>
-                                        <div v-if="i.is_use === 0 && i.cron_type ==='interval'" style="width: 100px; font-size:12px">
+                                        
+                                        <div v-if="i.activity === 0">
+                                          已停止
+                                        </div>
+                                        <div v-if="i.activity === 1 && i.is_use === 0 && i.cron_type ==='interval'" style="width: 100px; font-size:12px">
                                           倒计时{{ i.interval - ((Math.floor(currentTime/1000)) - i.update_time) }} 秒
                                         </div>
-                                        <div v-if="i.is_use === 0 && i.cron_type ==='appointedTime'" style="width: 100px; font-size:12px">
+                                        <div v-if="i.activity === 1 && i.is_use === 0 && i.cron_type ==='appointedTime'" style="width: 100px; font-size:12px">
                                           倒计时{{ i.appointed_time - ((Math.floor(currentTime/1000))) }} 秒
                                         </div>
                                         <div v-if="i.is_use === 1" style="color: red; width: 100px;">
