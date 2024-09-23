@@ -17,6 +17,8 @@ use crate::utils::{date_util::get_now_time_m, mysql_utils::get_connect};
 
 static THREAD_STARTED: AtomicBool = AtomicBool::new(false);
 
+pub static CRON_UPDATE: AtomicBool = AtomicBool::new(false);
+
 lazy_static! {
     pub static ref CRON_MAP: Arc<Mutex<HashMap<String, CronInfo>>> =
         Arc::new(Mutex::new(HashMap::new()));
@@ -223,6 +225,7 @@ pub async fn update_tokio(info: CronInfo) -> bool {
     .bind(info.content).bind(info.interval).bind(info.cron_type).bind(info.appointed_time).bind(get_now_time_m()).bind(info.is_use).bind(info.pid).bind(info.category).bind(info.sort).bind(info.activity).bind(info.id)
     .execute(&mut conn.detach())
     .await;
+    CRON_UPDATE.store(true, Ordering::SeqCst);
 
     match result {
         Ok(_) => {
@@ -268,9 +271,10 @@ pub async fn stop_cron(info: CronInfo) -> bool {
         .acquire()
         .await
         .expect("Error get_connect from db pool");
-    let result = sqlx::query("UPDATE cron_title SET update_time=?,activity=?  where id = ?")
+    let result = sqlx::query("UPDATE cron_title SET update_time=?,activity=?,is_use=?  where id = ?")
         .bind(info.update_time)
         .bind(info.activity)
+        .bind(0)
         .bind(info.id)
         .execute(&mut conn.detach())
         .await;
@@ -338,11 +342,12 @@ pub async fn delete_by_id(id: String) -> bool {
 pub async fn get_list_cache() -> Vec<CronInfo> {
     //let mut list = CRON_LIST.lock().await;
     let mut map = CRON_MAP.lock().await;
-    if map.len() == 0 {
+    if map.len() == 0 || CRON_UPDATE.load(Ordering::SeqCst) {
         let cron_list = get_list_by_pid_and_category(String::from(""), String::from("cron")).await;
         for i in cron_list.iter() {
             map.insert(i.id.clone(), i.clone());
         }
+        CRON_UPDATE.store(false, Ordering::SeqCst);
     }
     map.values().cloned().collect()
 }

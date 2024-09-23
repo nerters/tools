@@ -1,3 +1,5 @@
+use std::sync::atomic::Ordering;
+
 use dao::{
     cron::{
         self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP
@@ -64,6 +66,7 @@ fn update_cron(
     category: String,
     is_use: i64,
     cron_type: String,
+    activity: i64,
 ) {
     let mut info = CronInfo::default();
     info.id = id;
@@ -76,6 +79,8 @@ fn update_cron(
     info.category = category;
     info.is_use = is_use;
     info.cron_type = cron_type;
+    info.activity = activity;
+    println!("更新");
     update_tokio(info);
 }
 
@@ -138,6 +143,7 @@ async fn use_cron(handle: tauri::AppHandle, id: String) {
         info.is_use = 0;
         info.update_time = get_now_time_m();
         update_use_tokio(info).await;
+        cron::CRON_UPDATE.store(true, Ordering::SeqCst);
     }
 }
 
@@ -150,6 +156,7 @@ async fn stop_cron(handle: tauri::AppHandle, id: String) {
             let mut temp = temp.clone();
             temp.update_time = get_now_time_m();
             temp.activity = 0;
+            temp.is_use = 0;
             map.insert(id.clone(), temp.clone());
 
             let mut win_key = "countDown-".to_string() + &id.clone();
@@ -172,6 +179,7 @@ async fn stop_cron(handle: tauri::AppHandle, id: String) {
         info.activity = 0;
         info.update_time = get_now_time_m();
         cron::stop_cron(info).await;
+        cron::CRON_UPDATE.store(true, Ordering::SeqCst);
     }
 }
 
@@ -270,6 +278,7 @@ async fn update_grid(
     info.y = y;
     info.w = w;
     info.h = h;
+    println!("更新");
     grid_info::update(info).await
 }
 

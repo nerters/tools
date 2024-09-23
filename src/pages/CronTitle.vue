@@ -154,7 +154,7 @@
       if (upForm.name && (upForm.interval || upForm.appointed_time) && upForm.content) {
 
         await invoke("update_cron", {id: upForm.id, name: upForm.name, content: upForm.content, interval: parseInt(upForm.interval), appointedTime: Math.floor(upForm.appointed_time/1000), 
-          pid: upForm.pid, sort: upForm.sort, category: upForm.category, isUse: upForm.is_use, cronType: upForm.cron_type});
+          pid: upForm.pid, sort: upForm.sort, category: upForm.category, isUse: upForm.is_use, cronType: upForm.cron_type, activity: upForm.activity});
 
           scene.children = await invoke("get_tree_cron");
           upCardData.value = !upCardData.value;
@@ -247,7 +247,7 @@
       for (let i = 0; i < result.length; i++) {
         let temp = result[i];
         await invoke("update_cron", {id: temp.id, name: temp.name, content: temp.content, interval: temp.interval, appointedTime: temp.appointed_time, 
-                                      pid: temp.pid, sort: i, category: temp.category, isUse: temp.is_use, cronType: temp.cron_type});
+                                      pid: temp.pid, sort: i, category: temp.category, isUse: temp.is_use, cronType: temp.cron_type, activity: temp.activity});
       }
       return result
     }
