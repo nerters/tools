@@ -37,6 +37,9 @@
     "fs:allow-create",
     "shell:allow-open",
     "clipboard-manager:allow-read-text",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled",
     {
       "identifier": "fs:scope-appdata",
       "allow": [

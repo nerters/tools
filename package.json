@@ -16,6 +16,7 @@
     "@codemirror/merge": "^6.6.1",
     "@codemirror/state": "^6.4.1",
     "@tauri-apps/api": ">=2.0.0-rc.0",
+    "@tauri-apps/plugin-autostart": "^2.0.0-rc.1",
     "@tauri-apps/plugin-clipboard-manager": "^2.0.0-rc.1",
     "@tauri-apps/plugin-dialog": "^2.0.0-rc.1",
     "@tauri-apps/plugin-fs": "^2.0.0-rc.2",

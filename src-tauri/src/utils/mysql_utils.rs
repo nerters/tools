@@ -58,6 +58,7 @@ pub async fn init_mysql_pool(db_url: &str) {
         'tenant_id' integer,
         'deleted' integer,
         'update_time' integer,
+        'activity' interger NOT NULL DEFAULT 1,
         PRIMARY KEY ('id')
       );
       

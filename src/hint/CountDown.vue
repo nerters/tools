@@ -1,11 +1,14 @@
 <template>
     
     <div class="alarm-box" data-tauri-drag-region >
-      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: 5px; padding-right: 5px; " data-tauri-drag-region>
-        <div style="display: flex; align-items: center; justify-content: center;">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding-left: 5px; padding-right: 5px; margin-top: -2px;" data-tauri-drag-region>
+        <div class="content" style="display: flex; align-items: center; justify-content: center; 
+                                    white-space: nowrap; /* 不换行 */ overflow: hidden; /* 隐藏超出部分 */ text-overflow: ellipsis; /* 用省略号表示隐藏的文本 */
+                                    margin-right: 5px; " 
+                                    data-tauri-drag-region>
           {{ title }}
         </div>
-        <div class="titlebar-button" id="titlebar-close" @click="close">
+        <div class="titlebar-button" id="titlebar-close" @click="close" style="margin-right: 5px; ">
             X
         </div>
       </div>
@@ -118,6 +121,12 @@ function getzf(num: number): string | number {
     justify-content: space-around;
     align-content: flex-start;
     flex-wrap: wrap;
+
+    background: rgba(61, 58, 58, 0.5); /* 半透明白色背景 */
+    backdrop-filter: blur(15px); /* 设置模糊程度 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+
+
   }
   
 
@@ -135,6 +144,10 @@ function getzf(num: number): string | number {
     }
     .titlebar-button:hover {
     background: #a1a6a7;
+    }
+
+    .content {
+      user-select: none; /* 标准语法 */
     }
   </style>
   
