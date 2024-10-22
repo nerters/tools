@@ -187,6 +187,8 @@ function openFun(id: String) {
   }
 }
 
+//router.push({path:  "/main/CronTitle"}); 
+
 
 async function merge_data():Promise<any[]> {
   let tempList = [];

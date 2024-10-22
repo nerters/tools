@@ -368,18 +368,26 @@ pub async fn alert_win(handle: tauri::AppHandle) {
             let now = get_now_time_m();
             //获取缓存中的值
             let list = get_list_cache().await;
-            for i in list.iter() {
-                if i.activity == 1 && (i.is_use == 1
-                    || (i.cron_type == "interval"
-                        && i.is_use == 0
-                        && i.interval + i.update_time < now)
-                    || (i.cron_type == "appointedTime" && i.is_use == 0 && i.appointed_time < now))
-                {
-                    new_win(handle.clone(), i.clone()).await;
+            for i in 0..list.len() {
+                let list = get_list_cache().await;
+                let i = list.get(i);
+                match i {
+                    Some(i) => {
+                        if i.activity == 1 && (i.is_use == 1
+                            || (i.cron_type == "interval"
+                                && i.is_use == 0
+                                && i.interval + i.update_time < now)
+                            || (i.cron_type == "appointedTime" && i.is_use == 0 && i.appointed_time < now))
+                        {
+                            new_win(handle.clone(), i.clone()).await;
+                        }
+                    },
+                    None => {
+                        break;
+                    },
                 }
             }
-
-            let ten_millis = time::Duration::from_millis(1000 * 5);
+            let ten_millis = time::Duration::from_millis(1000 * 10);
             sleep(ten_millis)
         }
         // 设置标志位，表示线程已经启动

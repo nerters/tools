@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use idgen::IDGen;
 use lazy_static::lazy_static;
-use tauri::Runtime;
+use tauri::{async_runtime::spawn, Runtime};
+use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_global_shortcut::ShortcutState;
-use tauri_plugin_shell::{open::Program, ShellExt};
+use tauri_plugin_shell::ShellExt;
 use tokio::sync::Mutex;
 
 use crate::dao::hot_key::{self, HotKey};
-mod dao;
 
 lazy_static! {
     pub static ref CRON_MAP: Arc<Mutex<Vec<String>>> =
@@ -38,6 +38,87 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                         if ele.path.eq("webPage") {
                             println!("{}", ele.url.clone());
                             app.shell().open(ele.url.clone(), None);
+                        } if ele.path.eq("openProgram") {
+                            let app_clone = app.clone();
+                            let ele_clone = ele.clone();
+                            spawn(async move {
+                                let output = app_clone.shell()
+                                .command(ele_clone.shell) 
+                                .output()
+                                .await;
+
+                                match output {
+                                    Ok(output) => {
+                                        if output.status.success() {
+                                            println!("Result: {:?}", String::from_utf8(output.stdout));
+                                        } else {
+                                            let _ = app_clone.dialog()
+                                            .message("执行失败")
+                                            .kind(MessageDialogKind::Info)
+                                            .title("提示")
+                                            .blocking_show();
+                                            println!("Exit with code: {}", output.status.code().unwrap());
+                                        }
+                                    },
+                                    Err(e) => {
+                                        let _ = app_clone.dialog()
+                                            .message("执行失败")
+                                            .kind(MessageDialogKind::Info)
+                                            .title("提示")
+                                            .blocking_show();
+                                        println!("{}", e);
+                                        println!("执行shell失败！");
+                                    },
+                                }
+                            });
+                            
+
+                           
+                        } if ele.path.eq("doShell") {
+                            let app_clone = app.clone();
+                            let ele_clone = hot_key::get_info_by_id(ele.clone().id);
+                            spawn(async move {
+                                let output = app_clone.shell()
+                                .command("powershell") 
+                                .args(&[
+                                    ele_clone.shell
+                                ])
+                                .output()
+                                .await;
+
+                                match output {
+                                    Ok(output) => {
+                                        if output.status.success() {
+                                            let msg = String::from_utf8(output.stdout).unwrap();
+                                            let _ = app_clone.dialog()
+                                            .message(msg.clone())
+                                            .kind(MessageDialogKind::Info)
+                                            .title("提示")
+                                            .blocking_show();
+                                            println!("Result: {:?}", msg);
+                                        } else {
+                                            let _ = app_clone.dialog()
+                                            .message("执行失败")
+                                            .kind(MessageDialogKind::Info)
+                                            .title("提示")
+                                            .blocking_show();
+                                            println!("Exit with code: {}", output.status.code().unwrap());
+                                        }
+                                    },
+                                    Err(e) => {
+                                        let _ = app_clone.dialog()
+                                            .message("执行失败")
+                                            .kind(MessageDialogKind::Info)
+                                            .title("提示")
+                                            .blocking_show();
+                                        println!("{}", e);
+                                        println!("执行shell失败！");
+                                    },
+                                }
+                            });
+                            
+
+                           
                         } else {
                             open_web(app, ele.path.clone(), ele.overopen == 1);
                         }

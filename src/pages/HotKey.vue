@@ -14,6 +14,7 @@ const sizeForm = reactive({
       key2: '',
       path: '',
       url: '',
+      shell: '',
       desc: '',
       overopen: '0',
     })
@@ -24,7 +25,7 @@ onMounted(async () => {
 })
 
 async function update() {
-    await invoke("update_hot_key",{id: sizeForm.id, path: sizeForm.path, key: sizeForm.key1 + "+" + sizeForm.key2, desc: sizeForm.desc, overopen: parseInt(sizeForm.overopen.toString()), url: sizeForm.url});
+    await invoke("update_hot_key",{id: sizeForm.id, path: sizeForm.path, key: sizeForm.key1 + "+" + sizeForm.key2, desc: sizeForm.desc, overopen: parseInt(sizeForm.overopen.toString()), url: sizeForm.url, shell: sizeForm.shell});
     sizeForm.id = '';
     sizeForm.key = '';
     sizeForm.path = '';
@@ -32,6 +33,7 @@ async function update() {
     sizeForm.key2 = '';
     sizeForm.desc = '';
     sizeForm.url = '';
+    sizeForm.shell = '';
     sizeForm.overopen = '0';
     //刷新
     tableData.value = await invoke("get_hot_key_list");
@@ -40,7 +42,7 @@ async function update() {
 
 async function add() {
     console.log("==")
-    await invoke("add_hot_key",{path: sizeForm.path, key: sizeForm.key1 + "+" + sizeForm.key2, desc: sizeForm.desc, overopen: parseInt(sizeForm.overopen.toString()), url: sizeForm.url});
+    await invoke("add_hot_key",{path: sizeForm.path, key: sizeForm.key1 + "+" + sizeForm.key2, desc: sizeForm.desc, overopen: parseInt(sizeForm.overopen.toString()), url: sizeForm.url, shell: sizeForm.shell});
     sizeForm.id = '';
     sizeForm.key = '';
     sizeForm.path = '';
@@ -48,6 +50,7 @@ async function add() {
     sizeForm.key2 = '';
     sizeForm.desc = '';
     sizeForm.url = '';
+    sizeForm.shell = '';
     sizeForm.overopen = '0';
     //刷新
     tableData.value = await invoke("get_hot_key_list");
@@ -75,6 +78,7 @@ async function del(id: String) {
     sizeForm.key2 = row.key2;
     sizeForm.desc = row.desc;
     sizeForm.url = row.url;
+    sizeForm.shell = row.shell;
     sizeForm.overopen = row.overopen.toString();
     }">
 
@@ -173,11 +177,16 @@ async function del(id: String) {
           <el-option label="定时器" value="CronTitle" />
 
           <el-option label="打开网址" value="webPage" />
+          <el-option label="执行命令" value="doShell" />
+          <el-option label="打开应用" value="openProgram" />
         </el-select>
     </el-form-item>
 
     <el-form-item v-if="sizeForm.path == 'webPage'" label="网址">
         <el-input v-model="sizeForm.url" />
+    </el-form-item>
+    <el-form-item v-if="sizeForm.path == 'doShell'" label="命令">
+        <el-input v-model="sizeForm.shell" type="textarea" style="width: 240px"/>
     </el-form-item>
 
     <el-form-item label="描述">
@@ -264,13 +273,17 @@ async function del(id: String) {
               <el-option label="定时器" value="CronTitle" />
 
               <el-option label="打开网址" value="webPage" />
+              <el-option label="执行命令" value="doShell" />
+              <el-option label="打开应用" value="openProgram" />
             </el-select>
         </el-form-item>
 
         <el-form-item v-if="sizeForm.path == 'webPage'" label="网址">
             <el-input v-model="sizeForm.url" />
         </el-form-item>
-
+        <el-form-item v-if="sizeForm.path == 'doShell'" label="命令">
+            <el-input v-model="sizeForm.shell" type="textarea" style="width: 240px"/>
+        </el-form-item>
         <el-form-item label="描述">
             <el-input v-model="sizeForm.desc" />
         </el-form-item>
