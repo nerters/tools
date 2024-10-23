@@ -2,13 +2,15 @@ use std::sync::Arc;
 
 use idgen::IDGen;
 use lazy_static::lazy_static;
-use tauri::{async_runtime::spawn, Runtime};
+use ollama_rs::{generation::completion::request::GenerationRequest, Ollama};
+use tauri::{async_runtime::spawn, Manager, Runtime};
+use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_shell::ShellExt;
 use tokio::sync::Mutex;
 
-use crate::dao::hot_key::{self, HotKey};
+use crate::{dao::hot_key::{self, HotKey}, ALLAMA};
 
 lazy_static! {
     pub static ref CRON_MAP: Arc<Mutex<Vec<String>>> =
@@ -63,6 +65,7 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                 "shift+control+KeyX",
                 "shift+control+KeyY",
                 "shift+control+KeyZ",
+                "shift+control+alt+KeyX",
 
             ]).unwrap()
             .with_handler(move |app, shortcut: &tauri_plugin_global_shortcut::Shortcut, event| {
@@ -153,6 +156,30 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                     } else if ele.path.eq("openFun") {
                         println!("open");
                         open_web(app, ele.url.clone(), ele.overopen == 1);
+                    } else if shortcut.into_string().eq("shift+control+alt+KeyX") {
+                        //app.clipboard().write_text("Tauri is awesome!".to_string()).unwrap();
+
+                        // Read content from clipboard
+                        let content = app.clipboard().read_text();
+                        let ask =  content.unwrap();
+                        println!("{:?}", ask);
+           
+                        let app_clone = app.clone();
+                        spawn(async move {
+                            let model = "llama3.2".to_string();
+                            let allama = ALLAMA.get().expect("Error get pool from OneCell<Pool>");
+                            println!("{}", model);
+                            let res = allama.generate(GenerationRequest::new(model, ask)).await;
+                        
+                            if let Ok(res) = res {
+                                let msg = res.response.to_string();
+                                open_msg(&app_clone, msg).await;
+                                println!("{}", res.response);
+                            }
+                        });
+                        
+
+
                     }
                 }
             })
@@ -222,4 +249,66 @@ pub fn open_web<R: Runtime>(app: &tauri::AppHandle<R>, path: String, overopen: b
             println!("启动窗口失败!");
         }
     }
+}
+
+
+
+async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
+    println!("执行msg");
+    let win_key = "dev-".to_string() + "159357";
+    if let Some(_win) = handle.get_webview_window(&win_key) {
+        println!("窗口已启动!");
+    } else {
+        let win_list = handle.webview_windows();
+        let mut win_num = 0;
+        for (key, _value) in win_list {
+            if key.starts_with("dev") {
+                win_num += 1;
+            }
+        }
+        let docs_window = tauri::WebviewWindowBuilder::new(
+            handle,
+            win_key, /* the unique window label */
+            tauri::WebviewUrl::App("/hint/message".parse().unwrap()),
+        )
+        .title(msg)
+        .inner_size(300.0, 150.0)
+        .decorations(false)
+        .transparent(true)
+        .resizable(false)
+        .position(0.0, 800.0 + (win_num as f64) * 100.0)
+        .build();
+
+        match docs_window {
+            Ok(win) => {
+                let _ = win.set_always_on_top(true);
+            }
+            Err(_) => {
+                println!("启动窗口失败!");
+            }
+        }
+    }
+}
+
+#[test]
+fn test1() {
+    test()
+}
+
+#[tokio::main]
+async fn test() {
+    // For custom values:
+    let ollama = Ollama::new("http://localhost".to_string(), 11434);
+    let model = "llama3.2".to_string();
+    let prompt = "Why is the sky blue?".to_string();
+
+
+    let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
+
+    if let Ok(res) = res {
+        let msg = res.response.to_string();
+       
+        println!("{}", res.response);
+    }
+ 
 }

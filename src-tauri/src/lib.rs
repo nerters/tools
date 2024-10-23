@@ -1,4 +1,6 @@
+use ollama_rs::Ollama;
 use tauri::{AppHandle, Manager};
+use once_cell::sync::OnceCell;
 use utils::mysql_utils::init_mysql_pool;
 mod dao;
 mod img;
@@ -11,12 +13,20 @@ mod tray;
 #[cfg(desktop)]
 mod hotKey;
 
+pub static ALLAMA: OnceCell<Ollama> = OnceCell::new();
+
+
 
 
 #[tokio::main]
 async fn init() {
     //init_mysql_pool("mysql://账号:密码@数据库地址/数据库");
     init_mysql_pool("mydatabase.db").await;
+       // For custom values:
+    ALLAMA
+    .set(Ollama::new("http://localhost".to_string(), 11434))
+    .unwrap_or_else(|_| println!("try insert pool cell failure!"));
+
 }
 
 fn show_window(app: &AppHandle) {

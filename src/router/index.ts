@@ -105,6 +105,15 @@ const routes: Array<RouteRecordRaw> = [
         },
         {
           //路由初始指向
+            path: 'Message',
+            name: 'Message',
+            meta: {
+              title: 'Message'
+            },
+            component:()=>import('../hint/Message.vue')
+        },
+        {
+          //路由初始指向
             path: 'CountDown',
             name: 'CountDown',
             meta: {
