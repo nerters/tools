@@ -246,7 +246,7 @@ pub async fn delete_by_id(id: String) -> bool {
     }
 }
 
-
+#[tokio::main]
 pub async fn get_info_by_key(key: String) -> HotKey {
     let conn = get_connect()
         .acquire()

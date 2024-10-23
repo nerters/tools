@@ -18,9 +18,6 @@ lazy_static! {
 
 
 pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
-    let list = hot_key::get_list();
-    let strs: Vec<&str> = list.iter().map(|ele| ele.key.as_str()).collect();
-
     if app.clone().remove_plugin("global-shortcut")  {
         println!("成功");
     } else {
@@ -29,99 +26,133 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
 
     match app.plugin(
         tauri_plugin_global_shortcut::Builder::new()
-            .with_shortcuts(strs).unwrap()
-            .with_handler(move |app, shortcut, event| {
+            .with_shortcuts([
+                "shift+control+Digit1",
+                "shift+control+Digit2",
+                "shift+control+Digit3",
+                "shift+control+Digit4",
+                "shift+control+Digit5",
+                "shift+control+Digit6",
+                "shift+control+Digit7",
+                "shift+control+Digit8",
+                "shift+control+Digit9",
+                "shift+control+KeyA",
+                "shift+control+KeyB",
+                "shift+control+KeyC",
+                "shift+control+KeyD",
+                "shift+control+KeyE",
+                "shift+control+KeyF",
+                "shift+control+KeyG",
+                "shift+control+KeyH",
+                "shift+control+KeyI",
+                "shift+control+KeyJ",
+                "shift+control+KeyK",
+
+                "shift+control+KeyL",
+                "shift+control+KeyM",
+                "shift+control+KeyN",
+                "shift+control+KeyO",
+                "shift+control+KeyP",
+                "shift+control+KeyQ",
+                "shift+control+KeyR",
+                "shift+control+KeyS",
+                "shift+control+KeyT",
+                "shift+control+KeyU",
+                "shift+control+KeyV",
+                "shift+control+KeyW",
+                "shift+control+KeyX",
+                "shift+control+KeyY",
+                "shift+control+KeyZ",
+
+            ]).unwrap()
+            .with_handler(move |app, shortcut: &tauri_plugin_global_shortcut::Shortcut, event| {
                 println!("{}", shortcut.into_string());
-                for ele in &list {
-                    // 添加新的事件处理逻辑
-                    if ele.key.eq(&shortcut.into_string()) && event.state == ShortcutState::Pressed {
-                        if ele.path.eq("webPage") {
-                            println!("{}", ele.url.clone());
-                            app.shell().open(ele.url.clone(), None);
-                        } if ele.path.eq("openProgram") {
-                            let app_clone = app.clone();
-                            let ele_clone = ele.clone();
-                            spawn(async move {
-                                let output = app_clone.shell()
-                                .command(ele_clone.shell) 
-                                .output()
-                                .await;
 
-                                match output {
-                                    Ok(output) => {
-                                        if output.status.success() {
-                                            println!("Result: {:?}", String::from_utf8(output.stdout));
-                                        } else {
-                                            let _ = app_clone.dialog()
-                                            .message("执行失败")
-                                            .kind(MessageDialogKind::Info)
-                                            .title("提示")
-                                            .blocking_show();
-                                            println!("Exit with code: {}", output.status.code().unwrap());
-                                        }
-                                    },
-                                    Err(e) => {
+                if event.state() == ShortcutState::Pressed {
+                    let ele = hot_key::get_info_by_key(shortcut.into_string());
+                    if ele.path.eq("webPage") {
+                        println!("{}", ele.url.clone());
+                        let _ = app.shell().open(ele.url.clone(), None);
+                    
+                    } if ele.path.eq("openProgram") {
+                        let app_clone = app.clone();
+                        let ele_clone = ele.clone();
+                        spawn(async move {
+                            let output = app_clone.shell()
+                            .command(ele_clone.shell) 
+                            .output()
+                            .await;
+                            match output {
+                                Ok(output) => {
+                                    if output.status.success() {
+                                        println!("Result: {:?}", String::from_utf8(output.stdout));
+                                    } else {
+                                        let path = format!("执行失败: {}", output.status.code().unwrap());
                                         let _ = app_clone.dialog()
-                                            .message("执行失败")
-                                            .kind(MessageDialogKind::Info)
-                                            .title("提示")
-                                            .blocking_show();
-                                        println!("{}", e);
-                                        println!("执行shell失败！");
-                                    },
-                                }
-                            });
-                            
-
-                           
-                        } if ele.path.eq("doShell") {
-                            let app_clone = app.clone();
-                            let ele_clone = hot_key::get_info_by_id(ele.clone().id);
-                            spawn(async move {
-                                let output = app_clone.shell()
-                                .command("powershell") 
-                                .args(&[
-                                    ele_clone.shell
-                                ])
-                                .output()
-                                .await;
-
-                                match output {
-                                    Ok(output) => {
-                                        if output.status.success() {
-                                            let msg = String::from_utf8(output.stdout).unwrap();
-                                            let _ = app_clone.dialog()
-                                            .message(msg.clone())
-                                            .kind(MessageDialogKind::Info)
-                                            .title("提示")
-                                            .blocking_show();
-                                            println!("Result: {:?}", msg);
-                                        } else {
-                                            let _ = app_clone.dialog()
-                                            .message("执行失败")
-                                            .kind(MessageDialogKind::Info)
-                                            .title("提示")
-                                            .blocking_show();
-                                            println!("Exit with code: {}", output.status.code().unwrap());
-                                        }
-                                    },
-                                    Err(e) => {
+                                        .message(path)
+                                        .kind(MessageDialogKind::Info)
+                                        .title("提示")
+                                        .blocking_show();
+                                        println!("Exit with code: {}", output.status.code().unwrap());
+                                    }
+                                },
+                                Err(e) => {
+                                    let path = format!("执行失败：{}", e);
+                                    let _ = app_clone.dialog()
+                                        .message(path)
+                                        .kind(MessageDialogKind::Info)
+                                        .title("提示")
+                                        .blocking_show();
+                                    println!("{}", e);
+                                    println!("执行shell失败！");
+                                },
+                            }
+                        }); 
+                    } if ele.path.eq("doShell") {
+                        let app_clone = app.clone();
+                        spawn(async move {
+                            let output = app_clone.shell()
+                            .command("powershell") 
+                            .args(&[
+                                ele.shell
+                            ])
+                            .output()
+                            .await;
+                            match output {
+                                Ok(output) => {
+                                    if output.status.success() {
+                                        let msg = String::from_utf8(output.stdout).unwrap();
                                         let _ = app_clone.dialog()
-                                            .message("执行失败")
-                                            .kind(MessageDialogKind::Info)
-                                            .title("提示")
-                                            .blocking_show();
-                                        println!("{}", e);
-                                        println!("执行shell失败！");
-                                    },
-                                }
-                            });
-                            
-
-                           
-                        } else {
-                            open_web(app, ele.path.clone(), ele.overopen == 1);
-                        }
+                                        .message(msg.clone())
+                                        .kind(MessageDialogKind::Info)
+                                        .title("提示")
+                                        .blocking_show();
+                                        //println!("Result: {:?}", msg);
+                                    } else {
+                                        let path = format!("执行失败: {}", output.status.code().unwrap());
+                                        let _ = app_clone.dialog()
+                                        .message(path)
+                                        .kind(MessageDialogKind::Info)
+                                        .title("提示")
+                                        .blocking_show();
+                                        //println!("Exit with code: {}", output.status.code().unwrap());
+                                    }
+                                },
+                                Err(e) => {
+                                    let path = format!("执行失败：{}", e);
+                                    let _ = app_clone.dialog()
+                                        .message(path)
+                                        .kind(MessageDialogKind::Info)
+                                        .title("提示")
+                                        .blocking_show();
+                                    println!("{}", e);
+                                    println!("执行shell失败！");
+                                },
+                            }
+                        });
+                    } else if ele.path.eq("openFun") {
+                        println!("open");
+                        open_web(app, ele.url.clone(), ele.overopen == 1);
                     }
                 }
             })

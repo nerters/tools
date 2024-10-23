@@ -167,18 +167,26 @@ async function del(id: String) {
         </el-row>
 
     </el-form-item>
-    <el-form-item label="功能">
+    <el-form-item label="类型">
         <el-select
           v-model="sizeForm.path"
           placeholder="请选择"
           >
-          <el-option label="JSON" value="Json" />
-          <el-option label="RSA密码" value="RsaPage" />
-          <el-option label="定时器" value="CronTitle" />
-
+          <el-option label="打开功能页" value="openFun" />
           <el-option label="打开网址" value="webPage" />
           <el-option label="执行命令" value="doShell" />
           <el-option label="打开应用" value="openProgram" />
+        </el-select>
+    </el-form-item>
+
+    <el-form-item v-if="sizeForm.path == 'openFun'" label="功能">
+        <el-select
+            v-model="sizeForm.url"
+            placeholder="请选择"
+            >
+            <el-option label="JSON" value="Json" />
+            <el-option label="RSA密码" value="RsaPage" />
+            <el-option label="定时器" value="CronTitle" />
         </el-select>
     </el-form-item>
 
@@ -263,18 +271,26 @@ async function del(id: String) {
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item label="功能">
+        <el-form-item label="类型">
             <el-select
               v-model="sizeForm.path"
               placeholder="请选择"
               >
-              <el-option label="JSON" value="Json" />
-              <el-option label="RSA密码" value="RsaPage" />
-              <el-option label="定时器" value="CronTitle" />
-
+              <el-option label="打开功能页" value="openFun" />
               <el-option label="打开网址" value="webPage" />
               <el-option label="执行命令" value="doShell" />
               <el-option label="打开应用" value="openProgram" />
+            </el-select>
+        </el-form-item>
+
+        <el-form-item v-if="sizeForm.path == 'openFun'" label="功能">
+            <el-select
+                v-model="sizeForm.url"
+                placeholder="请选择"
+                >
+                <el-option label="JSON" value="Json" />
+                <el-option label="RSA密码" value="RsaPage" />
+                <el-option label="定时器" value="CronTitle" />
             </el-select>
         </el-form-item>
 
