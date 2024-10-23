@@ -39,8 +39,18 @@
       let title = await appWindow.title();
       console.log(title)
       if (title == "tool-Json") {
-        let conent = await readText();
-        temp.value = conent;
+        try {
+          let conent = await readText();
+          if (conent) {
+            temp.value = conent;
+          } else {
+            temp.value = "";
+          }
+        } catch (error) {
+          temp.value = "";
+        }
+
+     
       } else {
         //判断默认文件是否存在
         let data = await props.getCacheFile(cacheFileName);

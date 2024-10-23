@@ -73,6 +73,7 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
 
                 if event.state() == ShortcutState::Pressed {
                     let ele = hot_key::get_info_by_key(shortcut.into_string());
+                    println!("{}", ele.path);
                     if ele.path.eq("webPage") {
                         println!("{}", ele.url.clone());
                         let _ = app.shell().open(ele.url.clone(), None);

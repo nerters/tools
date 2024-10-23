@@ -21,12 +21,6 @@ pub fn add_hot_key(handle: tauri::AppHandle, key: String, path: String, desc: St
     info.shell = shell;
     info.overopen = overopen;
     let _ = hot_key::save(info.clone());
-    #[cfg(all(desktop))]
-    {
-        let _ = hotKey::add_host_key(&handle, info);
-
-        let _ = hotKey::create_host_key(&handle);
-    }
 }
 
 #[tauri::command]
@@ -40,10 +34,6 @@ pub fn update_hot_key(handle: tauri::AppHandle, id: String, key: String, path: S
     info.shell = shell;
     info.overopen = overopen;
     let _ = hot_key::update(info);
-    #[cfg(all(desktop))]
-    {
-        let _ = hotKey::create_host_key(&handle);
-    }
 }
 
 #[tauri::command]
@@ -57,8 +47,6 @@ pub fn delete_hot_key(handle: tauri::AppHandle, id: String) {
         } else {
             println!("失败global-shortcut");
         }  
-
-        let _ = hotKey::create_host_key(&handle); 
     }
 
 }
