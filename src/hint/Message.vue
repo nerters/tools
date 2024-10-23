@@ -29,10 +29,6 @@
       //appWindow.emit("ref_cron_list", true);
   }
 
-  async function stopCron() {
-    appWindow.close()
-    await invoke("stop_cron", {id: cronId.value});
-  }
 
 
   </script>
