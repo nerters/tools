@@ -136,6 +136,7 @@ async function del(id: String) {
               style="width: 125px;"
               >
               <el-option label="shift+ctrl" value="shift+control" />
+              <el-option label="shift+ctrl+alt" value="shift+control+alt" />
             </el-select>
           </el-col>
           <el-col :span="12">
@@ -162,6 +163,23 @@ async function del(id: String) {
               <el-option label="G" value="KeyG" />
               <el-option label="H" value="KeyH" />
               <el-option label="I" value="KeyI" />
+              <el-option label="G" value="KeyG" />
+              <el-option label="K" value="KeyK" />
+              <el-option label="L" value="KeyL" />
+              <el-option label="M" value="KeyM" />
+              <el-option label="N" value="KeyN" />
+              <el-option label="O" value="KeyO" />
+              <el-option label="P" value="KeyP" />
+              <el-option label="Q" value="KeyQ" />
+              <el-option label="R" value="KeyR" />
+              <el-option label="S" value="KeyS" />
+              <el-option label="T" value="KeyT" />
+              <el-option label="U" value="KeyU" />
+              <el-option label="V" value="KeyV" />
+              <el-option label="W" value="KeyW" />
+              <el-option label="X" value="KeyX" />
+              <el-option label="Y" value="KeyY" />
+              <el-option label="Z" value="KeyZ" />
             </el-select>
           </el-col>
         </el-row>
@@ -176,6 +194,7 @@ async function del(id: String) {
           <el-option label="打开网址" value="webPage" />
           <el-option label="执行命令" value="doShell" />
           <el-option label="打开应用" value="openProgram" />
+          <el-option label="唤醒ollama" value="ollama" />
         </el-select>
     </el-form-item>
 
@@ -196,7 +215,9 @@ async function del(id: String) {
     <el-form-item v-if="sizeForm.path == 'doShell'" label="命令">
         <el-input v-model="sizeForm.shell" type="textarea" style="width: 240px"/>
     </el-form-item>
-
+    <el-form-item v-if="sizeForm.path == 'ollama'" label="模型">
+            <el-input v-model="sizeForm.shell" type="textarea" />
+        </el-form-item>
     <el-form-item label="描述">
         <el-input v-model="sizeForm.desc" />
     </el-form-item>
@@ -241,6 +262,7 @@ async function del(id: String) {
                 style="width: 125px;"
                 >
                 <el-option label="shift+ctrl" value="shift+control" />
+                <el-option label="shift+ctrl+alt" value="shift+control+alt" />
               </el-select>
             </el-col>
             <el-col :span="12">
@@ -250,23 +272,40 @@ async function del(id: String) {
                 style="width: 125px;"
                 >
                 <el-option label="1" value="Digit1" />
-                <el-option label="2" value="Digit2" />
-                <el-option label="3" value="Digit3" />
-                <el-option label="4" value="Digit4" />
-                <el-option label="5" value="Digit5" />
-                <el-option label="6" value="Digit6" />
-                <el-option label="7" value="Digit7" />
-                <el-option label="8" value="Digit8" />
-                <el-option label="9" value="Digit9" />
-                <el-option label="A" value="KeyA" />
-                <el-option label="B" value="KeyB" />
-                <el-option label="C" value="KeyC" />
-                <el-option label="D" value="KeyD" />
-                <el-option label="E" value="KeyE" />
-                <el-option label="F" value="KeyF" />
-                <el-option label="G" value="KeyG" />
-                <el-option label="H" value="KeyH" />
-                <el-option label="I" value="KeyI" />
+              <el-option label="2" value="Digit2" />
+              <el-option label="3" value="Digit3" />
+              <el-option label="4" value="Digit4" />
+              <el-option label="5" value="Digit5" />
+              <el-option label="6" value="Digit6" />
+              <el-option label="7" value="Digit7" />
+              <el-option label="8" value="Digit8" />
+              <el-option label="9" value="Digit9" />
+              <el-option label="A" value="KeyA" />
+              <el-option label="B" value="KeyB" />
+              <el-option label="C" value="KeyC" />
+              <el-option label="D" value="KeyD" />
+              <el-option label="E" value="KeyE" />
+              <el-option label="F" value="KeyF" />
+              <el-option label="G" value="KeyG" />
+              <el-option label="H" value="KeyH" />
+              <el-option label="I" value="KeyI" />
+              <el-option label="G" value="KeyG" />
+              <el-option label="K" value="KeyK" />
+              <el-option label="L" value="KeyL" />
+              <el-option label="M" value="KeyM" />
+              <el-option label="N" value="KeyN" />
+              <el-option label="O" value="KeyO" />
+              <el-option label="P" value="KeyP" />
+              <el-option label="Q" value="KeyQ" />
+              <el-option label="R" value="KeyR" />
+              <el-option label="S" value="KeyS" />
+              <el-option label="T" value="KeyT" />
+              <el-option label="U" value="KeyU" />
+              <el-option label="V" value="KeyV" />
+              <el-option label="W" value="KeyW" />
+              <el-option label="X" value="KeyX" />
+              <el-option label="Y" value="KeyY" />
+              <el-option label="Z" value="KeyZ" />
               </el-select>
             </el-col>
           </el-row>
@@ -280,6 +319,7 @@ async function del(id: String) {
               <el-option label="打开网址" value="webPage" />
               <el-option label="执行命令" value="doShell" />
               <el-option label="打开应用" value="openProgram" />
+              <el-option label="唤醒ollama" value="ollama" />
             </el-select>
         </el-form-item>
 
@@ -299,6 +339,9 @@ async function del(id: String) {
         </el-form-item>
         <el-form-item v-if="sizeForm.path == 'doShell'" label="命令">
             <el-input v-model="sizeForm.shell" type="textarea" style="width: 240px"/>
+        </el-form-item>
+        <el-form-item v-if="sizeForm.path == 'ollama'" label="模型">
+            <el-input v-model="sizeForm.shell" type="textarea" />
         </el-form-item>
         <el-form-item label="描述">
             <el-input v-model="sizeForm.desc" />

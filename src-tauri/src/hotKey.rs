@@ -156,7 +156,7 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                     } else if ele.path.eq("openFun") {
                         println!("open");
                         open_web(app, ele.url.clone(), ele.overopen == 1);
-                    } else if shortcut.into_string().eq("shift+control+alt+KeyX") {
+                    } else if ele.path.eq("ollama") {
                         //app.clipboard().write_text("Tauri is awesome!".to_string()).unwrap();
 
                         // Read content from clipboard
@@ -165,8 +165,8 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                         println!("{:?}", ask);
            
                         let app_clone = app.clone();
+                        let model = ele.shell;
                         spawn(async move {
-                            let model = "llama3.2".to_string();
                             let allama = ALLAMA.get().expect("Error get pool from OneCell<Pool>");
                             println!("{}", model);
                             let res = allama.generate(GenerationRequest::new(model, ask)).await;
