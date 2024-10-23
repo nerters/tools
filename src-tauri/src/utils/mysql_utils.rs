@@ -38,7 +38,7 @@ pub async fn init_mysql_pool(db_url: &str) {
 
     // 执行一个 SQL 查询，例如创建一个表
     let _ = sqlx::query("
-    CREATE TABLE 'cron_title' (
+    create table if not exists 'cron_title' (
     'id' TEXT NOT NULL,
     'name' TEXT,
     'content' TEXT,
@@ -64,7 +64,7 @@ pub async fn init_mysql_pool(db_url: &str) {
 
 
 
-    CREATE TABLE 'grid_info' (
+    create table if not exists 'grid_info' (
     'id' TEXT NOT NULL,
     'name' TEXT,
     'describe' TEXT,
@@ -93,7 +93,7 @@ pub async fn init_mysql_pool(db_url: &str) {
     );
 
 
-    CREATE TABLE 'hot_key' (
+   create table if not exists 'hot_key' (
     'id' TEXT NOT NULL,
     'key' TEXT NOT NULL,
     'path' TEXT NOT NULL,

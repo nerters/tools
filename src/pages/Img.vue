@@ -15,16 +15,39 @@
 
     <div>
       <div>
-        <label>
-          高：    <el-input  v-model="height"  style="width: 60px" maxlength="4" max="4000" size="large"  placeholder="Please Input"/>
-        </label>
+        <el-select
+          v-model="type"
+          placeholder="请选择"
+          
+          >
+          <el-option label="调整图片尺寸" value="size" />
+          <el-option label="压缩图片" value="compress" />
+          <el-option label="转黑白" value="grayscale" />
+        </el-select>
+        <div v-if="type == 'size'" style="margin-top: 10px;">
+          <label>
+            高：    <el-input  v-model="height"  style="width: 110px" maxlength="4" max="4000" size="large"  placeholder="Please Input"/>
+          </label>
 
-        <label>
-          低：    <el-input  v-model="width"  style="width: 60px" maxlength="4" max="4000" size="large"  placeholder="Please Input"/>
-        </label>
+          <label>
+            低：    <el-input  v-model="width"  style="width: 110px" maxlength="4" max="4000" size="large"  placeholder="Please Input"/>
+          </label>
+        </div>
+        <div v-if="type == 'compress'" style="margin-top: 10px;">
+          <label>
+            精度：    <el-input  v-model="quality"  style="width: 248px" maxlength="4" max="4000" size="large"  placeholder="Please Input"/>
+          </label>
+        </div>
+
       </div>
-      <el-button type="primary" style="width: 100%;" plain @click="change">转换</el-button>
+
+
+      <el-button type="primary" style="width: 300px; margin-top: 10px" plain @click="change">转换</el-button>
     </div>
+
+
+
+
     <div class="image-uploader" :class="{ 'hovered': isHoveredRes }" @mouseover="handleMouseOverRes" @mouseleave="handleMouseLeaveRes">
         <div class="image-container" v-if="imageUrl">
           <img :src="resultImg" alt="Uploaded Image">
@@ -45,8 +68,10 @@
   const imageUrl = ref()
   const filePaht = ref()
 
-  const height = ref()
-  const width = ref()
+  const type = ref("size");
+  const height = ref("12")
+  const width = ref("12")
+  const quality = ref("100")
 
   defineProps({
       getCacheFile:{
@@ -95,7 +120,8 @@
 
 
   async function change() {
-    let rest:string = await invoke("compress_img", {filePath: filePaht.value, nwidth: parseInt(width.value),  nheight: parseInt(height.value), imgType: "png"});
+    let rest:string = await invoke("compress_img", {filePath: filePaht.value, nwidth: parseInt(width.value),  nheight: parseInt(height.value),
+    typeF: type.value, quality: parseInt(quality.value)});
     resultImg.value = "data:image/png;base64," + rest
     console.log(rest)
   }
