@@ -343,9 +343,9 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
         let mut position_y = 800.0;
         let t: i32 = (win_num / 2) % 2;
         if t == 1 {
-            position_y = 800.0 + t as f64 * 50.0;
+            position_y = 800.0 + (win_num % 2) as f64 * 50.0;
         } else {
-            position_y = 800.0 + (2 - t) as f64 * 50.0;
+            position_y = 800.0 + (2 - win_num % 2) as f64 * 50.0;
         }
         let docs_window = tauri::WebviewWindowBuilder::new(
             handle,
