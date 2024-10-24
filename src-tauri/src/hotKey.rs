@@ -3,7 +3,7 @@ use std::sync::Arc;
 use idgen::IDGen;
 use lazy_static::lazy_static;
 use ollama_rs::{generation::completion::request::GenerationRequest, Ollama};
-use tauri::{async_runtime::spawn, Manager, Runtime};
+use tauri::{async_runtime::spawn, utils::config::Position, Manager, Runtime};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_global_shortcut::ShortcutState;
@@ -328,16 +328,24 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
     println!("执行msg");
     let idgen = IDGen::new(1);
     let id = idgen.new_id();
-    let win_key = "dev-".to_string() + id.to_string().as_str();
+    let win_key = "msg-".to_string() + id.to_string().as_str();
     if let Some(_win) = handle.get_webview_window(&win_key) {
         println!("窗口已启动!");
     } else {
         let win_list = handle.webview_windows();
         let mut win_num = 0;
         for (key, _value) in win_list {
-            if key.starts_with("dev") {
+            if key.starts_with("msg") {
                 win_num += 1;
             }
+        }
+        let position_x = 0.0 + (win_num as f64) * 50.0;
+        let mut position_y = 800.0;
+        let t: i32 = (win_num / 2) % 2;
+        if t == 1 {
+            position_y = 800.0 + t as f64 * 50.0;
+        } else {
+            position_y = 800.0 + (2 - t) as f64 * 50.0;
         }
         let docs_window = tauri::WebviewWindowBuilder::new(
             handle,
@@ -349,7 +357,7 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
         .decorations(false)
         .transparent(true)
         .resizable(false)
-        .position(0.0, 800.0 + (win_num as f64) * 100.0)
+        .position(position_x, position_y)
         .build();
 
         match docs_window {
