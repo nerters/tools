@@ -5,6 +5,7 @@
   "windows": [
     "main",
     "dev-*",
+    "msg-*",
     "countDown-*",
     "floating-*",
     "tool-*"

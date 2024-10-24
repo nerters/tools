@@ -37,7 +37,7 @@
   .alarm-box {
     /* position: fixed; */
     width: 100%;
-    height: 100%;
+    height: 150px;
    
 
     background-color: rgba(0, 0, 0, 0.5);
@@ -66,6 +66,7 @@
     background-color: #0056b3;
   }
 
+  
 
   </style>
   
