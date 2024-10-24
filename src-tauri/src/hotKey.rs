@@ -3,7 +3,7 @@ use std::sync::Arc;
 use idgen::IDGen;
 use lazy_static::lazy_static;
 use ollama_rs::{generation::completion::request::GenerationRequest, Ollama};
-use tauri::{async_runtime::spawn, utils::config::Position, Manager, Runtime};
+use tauri::{async_runtime::spawn, utils::config::Position, Manager, PhysicalPosition, Runtime};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_global_shortcut::ShortcutState;
@@ -301,19 +301,41 @@ pub fn open_web<R: Runtime>(app: &tauri::AppHandle<R>, path: String, overopen: b
         let id = idgen.new_id();
         lebel += id.to_string().as_str();
     }
+    let w = 800.0;
+    let h = 600.0;
     let docs_window = tauri::WebviewWindowBuilder::new(
         app,
         lebel, /* the unique window label */
         tauri::WebviewUrl::App(("/main/".to_string() + path.as_str()).parse().unwrap()),
     )
     .title(("tool-".to_string() + path.as_str()))
-    .inner_size(800.0, 600.0)
+    .inner_size(w, h)
     .decorations(false)
     .focused(true)
-    .position(500.0, 400.0)
+    //.position(500.0, 400.0)
     .build();
     match docs_window {
         Ok(win) => {
+            // 获取主窗口所在的屏幕
+            if let Some(monitor) = win.primary_monitor().unwrap() {
+                let size = monitor.size();
+                let width = size.width as f64;
+                let height = size.height as f64;
+
+                let mut position_x = width / 2.0 - w / 2.0;
+                let mut position_y = height / 2.0 - h / 2.0;
+                if position_y < 0.0 {
+                    position_y =  height / 2.0;
+                }
+                if position_x < 0.0 {
+                    position_x =  width / 2.0;
+                }
+                let _ = win.set_position(PhysicalPosition::new(position_x, position_y));
+            
+                println!("Screen resolution: {}x{}", width, height);
+            } else {
+                println!("Could not get monitor information");
+            }
             println!("启动窗口成功!");
         }
         Err(_) => {
@@ -339,14 +361,7 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
                 win_num += 1;
             }
         }
-        let position_x = 0.0 + (win_num as f64) * 50.0;
-        let mut position_y = 800.0;
-        let t: i32 = (win_num / 2) % 2;
-        if t == 1 {
-            position_y = 800.0 + (win_num % 2) as f64 * 50.0;
-        } else {
-            position_y = 800.0 + (2 - win_num % 2) as f64 * 50.0;
-        }
+
         let docs_window = tauri::WebviewWindowBuilder::new(
             handle,
             win_key, /* the unique window label */
@@ -357,12 +372,31 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
         .decorations(false)
         .transparent(true)
         .resizable(false)
-        .position(position_x, position_y)
         .build();
 
         match docs_window {
             Ok(win) => {
                 let _ = win.set_always_on_top(true);
+                // 获取主窗口所在的屏幕
+                if let Some(monitor) = win.primary_monitor().unwrap() {
+                    let size = monitor.size();
+                    let width = size.width;
+                    let height = size.height;
+
+                    let position_x = 0.0 + (win_num as f64) * 50.0;
+                    let mut position_y = (height - 300) as f64;
+                    let t: i32 = (win_num / 2) % 2;
+                    if t == 1 {
+                        position_y = 800.0 + (win_num % 2) as f64 * 50.0;
+                    } else {
+                        position_y = 800.0 + (2 - win_num % 2) as f64 * 50.0;
+                    }
+                    let _ = win.set_position(PhysicalPosition::new(position_x, position_y));
+                
+                    println!("Screen resolution: {}x{}", width, height);
+                } else {
+                    println!("Could not get monitor information");
+                }
             }
             Err(_) => {
                 println!("启动窗口失败!");

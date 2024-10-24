@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use ollama_rs::Ollama;
 use tauri::{AppHandle, Manager};
 use once_cell::sync::OnceCell;
@@ -14,7 +16,7 @@ mod tray;
 mod hotKey;
 
 pub static ALLAMA: OnceCell<Ollama> = OnceCell::new();
-
+pub static PHYSIZE: OnceCell<HashMap<String, u32>> = OnceCell::new();
 
 
 
@@ -57,6 +59,25 @@ pub fn run() {
         .plugin(tauri_plugin_sql::Builder::new().build())
         .setup(|app| {
             let mainwindow = app.get_webview_window("main").unwrap();
+
+            // 获取主窗口所在的屏幕
+            if let Some(monitor) = mainwindow.primary_monitor().unwrap() {
+                let size = monitor.size();
+                let width = size.width;
+                let height = size.height;
+                let mut map: HashMap<String, u32> = HashMap::new();
+                map.insert(String::from("width"), width);
+                map.insert(String::from("height"), height);
+
+                PHYSIZE
+                .set(map)
+                .unwrap_or_else(|_| println!("try insert pool cell failure!"));
+              
+                println!("Screen resolution: {}x{}", width, height);
+            } else {
+                println!("Could not get monitor information");
+            }
+
             let _ = mainwindow.show();
 
             #[cfg(all(desktop))]
