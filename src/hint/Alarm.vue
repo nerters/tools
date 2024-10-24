@@ -50,14 +50,14 @@
 
   async function close() {
       console.log(3);
-      appWindow.close()
       await invoke("use_cron", {id: cronId.value});
+      appWindow.close()
       //appWindow.emit("ref_cron_list", true);
   }
 
   async function stopCron() {
-    appWindow.close()
     await invoke("stop_cron", {id: cronId.value});
+    appWindow.close()
   }
 
 

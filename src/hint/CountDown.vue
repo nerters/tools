@@ -8,7 +8,7 @@
                                     data-tauri-drag-region>
           {{ title }}
         </div>
-        <div class="titlebar-button" id="titlebar-close" @click="close" style="margin-right: 5px; ">
+        <div class="titlebar-button" id="titlebar-close" @click="close" style="margin-right: 0px; width: 20px; text-align: center;">
             X
         </div>
       </div>

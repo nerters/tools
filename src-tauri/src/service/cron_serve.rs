@@ -101,7 +101,7 @@ pub async fn use_cron(handle: tauri::AppHandle, id: String) {
             temp.update_time = get_now_time_m();
             temp.is_use = 0;
             map.insert(id.clone(), temp.clone());
-
+            println!("cron更新缓存 : {}", temp.name);
             let mut win_key = "countDown-".to_string() + &id.clone();
 
             if let Some(window) = handle.get_webview_window("main") {
@@ -137,7 +137,7 @@ pub async fn stop_cron(handle: tauri::AppHandle, id: String) {
             temp.activity = 0;
             temp.is_use = 0;
             map.insert(id.clone(), temp.clone());
-
+            println!("cron更新缓存 : {}", temp.name);
             let mut win_key = "countDown-".to_string() + &id.clone();
 
             if let Some(window) = handle.get_webview_window("main") {

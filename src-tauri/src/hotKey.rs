@@ -219,7 +219,6 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                         let content = app.clipboard().read_text();
                         let ask =  content.unwrap();
                         println!("{:?}", ask);
-           
                         let app_clone = app.clone();
                         let model = shell.clone();
                         if model.is_empty() {

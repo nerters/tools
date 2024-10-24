@@ -254,7 +254,7 @@ pub async fn update_use_tokio(info: CronInfo) -> bool {
 
     match result {
         Ok(_) => {
-            println!("创建数据成功");
+            println!("cron保存 {} 成功", info.name);
             return true;
         }
         Err(e) => {
@@ -281,7 +281,7 @@ pub async fn stop_cron(info: CronInfo) -> bool {
 
     match result {
         Ok(_) => {
-            println!("创建数据成功");
+            println!("cron保存 {} 成功", info.name);
             return true;
         }
         Err(e) => {
@@ -386,6 +386,8 @@ pub async fn alert_win(handle: tauri::AppHandle) {
                         break;
                     },
                 }
+                let ten_millis = time::Duration::from_millis(1000 * 1);
+                sleep(ten_millis)
             }
             let ten_millis = time::Duration::from_millis(1000 * 10);
             sleep(ten_millis)
