@@ -38,6 +38,7 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                 "shift+control+Digit7",
                 "shift+control+Digit8",
                 "shift+control+Digit9",
+                "shift+control+Digit0",
                 "shift+control+KeyA",
                 "shift+control+KeyB",
                 "shift+control+KeyC",
@@ -49,7 +50,6 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                 "shift+control+KeyI",
                 "shift+control+KeyJ",
                 "shift+control+KeyK",
-
                 "shift+control+KeyL",
                 "shift+control+KeyM",
                 "shift+control+KeyN",
@@ -65,7 +65,43 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                 "shift+control+KeyX",
                 "shift+control+KeyY",
                 "shift+control+KeyZ",
+
+                "shift+control+alt+Digit1",
+                "shift+control+alt+Digit2",
+                "shift+control+alt+Digit3",
+                "shift+control+alt+Digit4",
+                "shift+control+alt+Digit5",
+                "shift+control+alt+Digit6",
+                "shift+control+alt+Digit7",
+                "shift+control+alt+Digit8",
+                "shift+control+alt+Digit9",
+                "shift+control+alt+Digit0",
+                "shift+control+alt+KeyA",
+                "shift+control+alt+KeyB",
+                "shift+control+alt+KeyC",
+                "shift+control+alt+KeyD",
+                "shift+control+alt+KeyE",
+                "shift+control+alt+KeyF",
+                "shift+control+alt+KeyG",
+                "shift+control+alt+KeyH",
+                "shift+control+alt+KeyI",
+                "shift+control+alt+KeyJ",
+                "shift+control+alt+KeyK",
+                "shift+control+alt+KeyL",
+                "shift+control+alt+KeyM",
+                "shift+control+alt+KeyN",
+                "shift+control+alt+KeyO",
+                "shift+control+alt+KeyP",
+                "shift+control+alt+KeyQ",
+                "shift+control+alt+KeyR",
+                "shift+control+alt+KeyS",
+                "shift+control+alt+KeyT",
+                "shift+control+alt+KeyU",
+                "shift+control+alt+KeyV",
+                "shift+control+alt+KeyW",
                 "shift+control+alt+KeyX",
+                "shift+control+alt+KeyY",
+                "shift+control+alt+KeyZ",
 
             ]).unwrap()
             .with_handler(move |app, shortcut: &tauri_plugin_global_shortcut::Shortcut, event| {
@@ -74,16 +110,26 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                 if event.state() == ShortcutState::Pressed {
                     let ele = hot_key::get_info_by_key(shortcut.into_string());
                     println!("{}", ele.path);
+                    let shell = ele.shell;
+
                     if ele.path.eq("webPage") {
                         println!("{}", ele.url.clone());
                         let _ = app.shell().open(ele.url.clone(), None);
                     
                     } if ele.path.eq("openProgram") {
                         let app_clone = app.clone();
-                        let ele_clone = ele.clone();
+                        let shell = shell.clone();
+                        if shell.is_empty() {
+                            let _ = app_clone.dialog()
+                            .message("shell为空！")
+                            .kind(MessageDialogKind::Info)
+                            .title("提示")
+                            .blocking_show();
+                            return;
+                        }
                         spawn(async move {
                             let output = app_clone.shell()
-                            .command(ele_clone.shell) 
+                            .command(shell) 
                             .output()
                             .await;
                             match output {
@@ -114,11 +160,20 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                         }); 
                     } if ele.path.eq("doShell") {
                         let app_clone = app.clone();
+                        let shell = shell.clone();
+                        if shell.is_empty() {
+                            let _ = app_clone.dialog()
+                            .message("shell为空！")
+                            .kind(MessageDialogKind::Info)
+                            .title("提示")
+                            .blocking_show();
+                            return;
+                        }
                         spawn(async move {
                             let output = app_clone.shell()
                             .command("powershell") 
                             .args(&[
-                                ele.shell
+                                shell
                             ])
                             .output()
                             .await;
@@ -166,16 +221,31 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                         println!("{:?}", ask);
            
                         let app_clone = app.clone();
-                        let model = ele.shell;
+                        let model = shell.clone();
+                        if model.is_empty() {
+                            let _ = app_clone.dialog()
+                            .message("模型为空！")
+                            .kind(MessageDialogKind::Info)
+                            .title("提示")
+                            .blocking_show();
+                            return;
+                        }
                         spawn(async move {
                             let allama = ALLAMA.get().expect("Error get pool from OneCell<Pool>");
                             println!("{}", model);
-                            let res = allama.generate(GenerationRequest::new(model, ask)).await;
+                            let res = allama.generate(GenerationRequest::new(model.clone(), ask)).await;
                         
                             if let Ok(res) = res {
                                 let msg = res.response.to_string();
                                 open_msg(&app_clone, msg).await;
                                 println!("{}", res.response);
+                            } else {
+                                let path = format!("{} 执行失败！", model);
+                                let _ = app_clone.dialog()
+                                        .message(path)
+                                        .kind(MessageDialogKind::Info)
+                                        .title("提示")
+                                        .blocking_show();
                             }
                         });
                         
@@ -256,7 +326,9 @@ pub fn open_web<R: Runtime>(app: &tauri::AppHandle<R>, path: String, overopen: b
 
 async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
     println!("执行msg");
-    let win_key = "dev-".to_string() + "159357";
+    let idgen = IDGen::new(1);
+    let id = idgen.new_id();
+    let win_key = "dev-".to_string() + id.to_string().as_str();
     if let Some(_win) = handle.get_webview_window(&win_key) {
         println!("窗口已启动!");
     } else {
