@@ -13,7 +13,7 @@ use std::{
 use tauri::{async_runtime::spawn, Manager, PhysicalPosition};
 use tokio::sync::Mutex;
 
-use crate::utils::{date_util::get_now_time_m, mysql_utils::get_connect};
+use crate::{utils::{date_util::get_now_time_m, mysql_utils::get_connect}, PHYSIZE};
 
 static THREAD_STARTED: AtomicBool = AtomicBool::new(false);
 
@@ -407,6 +407,17 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
                 win_num += 1;
             }
         }
+        
+        let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
+        //let width = physize.get("width").unwrap_or(&(1920 as u32)).count_zeros() as f64;
+        let height = physize.get("height").unwrap_or(&(1080 as u32)).count_zeros() as f64;
+
+        let position_x = 0.0;
+        let mut position_y = height / 2.0 + (win_num as f64) * 100.0;
+        if position_y > height {
+            position_y = height;
+        }
+
         println!("窗口title {}", cron.id);
         let docs_window = tauri::WebviewWindowBuilder::new(
             &handle,
@@ -418,7 +429,7 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
         .decorations(false)
         .transparent(true)
         .resizable(false)
-        //.position(0.0, 400.0 + (win_num as f64) * 100.0)
+        .position(position_x, position_y)
         .build();
 
         match docs_window {
