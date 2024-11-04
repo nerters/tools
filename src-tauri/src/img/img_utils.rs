@@ -1,15 +1,13 @@
-use std::fs::{self, File};
-use std::io::{BufWriter, Cursor, Error, Write};
+use std::fs::File;
+use std::io::{BufWriter, Cursor};
 use std::path::Path;
-use std::thread::sleep;
 use std::time::{Duration, Instant};
-use std::{fmt, time};
+use std::fmt;
 
 use base64::Engine;
 use image::codecs::jpeg::JpegEncoder;
-use image::codecs::png::PngEncoder;
 use image::imageops::FilterType;
-use image::{DynamicImage, ImageEncoder, ImageFormat, RgbaImage};
+use image::ImageFormat;
 
 struct Elapsed(Duration);
 

@@ -38,7 +38,6 @@ pub fn update_hot_key(handle: tauri::AppHandle, id: String, key: String, path: S
 
 #[tauri::command]
 pub fn delete_hot_key(handle: tauri::AppHandle, id: String) {
-    println!("111");
     let _ = hot_key::delete_by_id(id);
     #[cfg(all(desktop))]
     {

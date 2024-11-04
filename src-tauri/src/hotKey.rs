@@ -62,9 +62,7 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                 "shift+control+KeyU",
                 "shift+control+KeyV",
                 "shift+control+KeyW",
-                "shift+control+KeyX",
                 "shift+control+KeyY",
-                "shift+control+KeyZ",
 
                 "shift+control+alt+Digit1",
                 "shift+control+alt+Digit2",
@@ -247,9 +245,6 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                                         .blocking_show();
                             }
                         });
-                        
-
-
                     }
                 }
             })

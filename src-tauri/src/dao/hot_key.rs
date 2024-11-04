@@ -88,7 +88,7 @@ pub async fn get_list() -> Vec<HotKey> {
         Ok(mut rest) => {
             for ele in &mut rest {
                 let parts: Vec<&str> = ele.key.split('+').collect();
-                if parts.len() == 3 {
+                if parts.len() == 2 {
                     ele.key1 = parts[0].to_owned();
                     ele.key2 = parts[1].to_string();
                 } else if parts.len() == 3 {
