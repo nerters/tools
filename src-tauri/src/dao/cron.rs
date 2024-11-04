@@ -411,8 +411,8 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
         }
         
         let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-        //let width = physize.get("width").unwrap_or(&(1920 as u32)).count_zeros() as f64;
-        let height = physize.get("height").unwrap_or(&(1080 as u32)).count_zeros() as f64;
+        //let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
+        let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
 
         let position_x = 0.0;
         let mut position_y = height / 2.0 + (win_num as f64) * 100.0;

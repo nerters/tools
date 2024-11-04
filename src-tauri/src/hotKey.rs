@@ -298,8 +298,8 @@ pub fn open_web<R: Runtime>(app: &tauri::AppHandle<R>, path: String, overopen: b
     let w = 800.0;
     let h = 600.0;
     let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-    let width = physize.get("width").unwrap_or(&(1920 as u32)).count_zeros() as f64;
-    let height = physize.get("height").unwrap_or(&(1080 as u32)).count_zeros() as f64;
+    let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
+    let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
 
     let mut position_x = width / 2.0 - w / 2.0;
     let mut position_y = height / 2.0 - h / 2.0;
@@ -369,18 +369,19 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
         }
 
         let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-        //let width = physize.get("width").unwrap_or(&(1920 as u32)).count_zeros() as f64;
-        let height = physize.get("height").unwrap_or(&(1080 as u32)).count_zeros() as f64;
-
+        //let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
+        let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
+        //println!("Screen resolution: {}x{}", width, height);
         let position_x = 0.0 + (win_num as f64) * 50.0;
-        let mut position_y = (height - 300.0) as f64;
+        let mut position_y = (height - 400.0) as f64;
         let t: i32 = (win_num / 2) % 2;
         if t == 1 {
-            position_y = 800.0 + (win_num % 2) as f64 * 50.0;
+            position_y = (height - 400.0) + (win_num % 2) as f64 * 50.0;
         } else {
-            position_y = 800.0 + (2 - win_num % 2) as f64 * 50.0;
+            position_y = (height - 400.0) + (2 - win_num % 2) as f64 * 50.0;
         }
-
+        println!("Screen resolution: {}", position_y);
+// 1+1等于多少
         let docs_window = tauri::WebviewWindowBuilder::new(
             handle,
             win_key, /* the unique window label */
@@ -404,12 +405,12 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
                     let height = size.height;
 
                     let position_x = 0.0 + (win_num as f64) * 50.0;
-                    let mut position_y = (height - 300) as f64;
+                    let mut position_y = (height - 400) as f64;
                     let t: i32 = (win_num / 2) % 2;
                     if t == 1 {
-                        position_y = 800.0 + (win_num % 2) as f64 * 50.0;
+                        position_y = (height - 400) as f64 + (win_num % 2) as f64 * 50.0;
                     } else {
-                        position_y = 800.0 + (2 - win_num % 2) as f64 * 50.0;
+                        position_y = (height - 400) as f64 + (2 - win_num % 2) as f64 * 50.0;
                     }
                     let _ = win.set_position(PhysicalPosition::new(position_x, position_y));
                 
