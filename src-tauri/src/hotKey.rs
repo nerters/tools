@@ -221,18 +221,21 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
                             let allama = ALLAMA.get().expect("Error get pool from OneCell<Pool>");
                             println!("{}", model);
                             let res = allama.generate(GenerationRequest::new(model.clone(), ask)).await;
-                        
-                            if let Ok(res) = res {
-                                let msg = res.response.to_string();
-                                open_msg(&app_clone, msg).await;
-                                println!("{}", res.response);
-                            } else {
-                                let path = format!("{} 执行失败！", model);
-                                let _ = app_clone.dialog()
-                                        .message(path)
-                                        .kind(MessageDialogKind::Info)
-                                        .title("提示")
-                                        .blocking_show();
+
+                            match res {
+                                Ok(res) => {
+                                    let msg = res.response.to_string();
+                                    open_msg(&app_clone, msg).await;
+                                    println!("{}", res.response);
+                                },
+                                Err(e) => {
+                                    let path = format!("{} 执行失败！\n{}", model, e);
+                                    let _ = app_clone.dialog()
+                                            .message(path)
+                                            .kind(MessageDialogKind::Info)
+                                            .title("提示")
+                                            .blocking_show();
+                                },
                             }
                         });
                     }
