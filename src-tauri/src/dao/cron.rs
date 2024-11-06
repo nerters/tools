@@ -411,7 +411,7 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
         }
         
         let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-        //let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
+        let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
         let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
 
         let position_x = 0.0;
@@ -433,7 +433,8 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
         .resizable(false)
         .position(position_x, position_y)
         .build();
-
+        println!("Screen resolution: {}x{}", width, height);
+        println!("position: x : {} y : {}", position_x, position_y);
         match docs_window {
             Ok(win) => {
                 let _ = win.set_always_on_top(true);
@@ -449,8 +450,9 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
                         position_y = height;
                     }
                     let _ = win.set_position(PhysicalPosition::new(position_x, position_y));
-                
+            
                     println!("Screen resolution: {}x{}", width, height);
+                    println!("position: x : {} y : {}", position_x, position_y);
                 } else {
                     println!("Could not get monitor information");
                 }

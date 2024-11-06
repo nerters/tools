@@ -136,7 +136,7 @@ async function del(id: String) {
               style="width: 125px;"
               >
               <el-option label="shift+ctrl" value="shift+control" />
-              <el-option label="shift+ctrl+alt" value="shift+control+alt" />
+              <el-option label="ctrl+z" value="control+KeyZ" />
             </el-select>
           </el-col>
           <el-col :span="12">
@@ -145,41 +145,42 @@ async function del(id: String) {
               placeholder="请选择"
               style="width: 125px;"
               >
-              <el-option label="1" value="Digit1" />
-              <el-option label="2" value="Digit2" />
-              <el-option label="3" value="Digit3" />
-              <el-option label="4" value="Digit4" />
-              <el-option label="5" value="Digit5" />
-              <el-option label="6" value="Digit6" />
-              <el-option label="7" value="Digit7" />
-              <el-option label="8" value="Digit8" />
-              <el-option label="9" value="Digit9" />
-              <el-option label="A" value="KeyA" />
-              <el-option label="B" value="KeyB" />
-              <el-option label="C" value="KeyC" />
-              <el-option label="D" value="KeyD" />
-              <el-option label="E" value="KeyE" />
-              <el-option label="F" value="KeyF" />
-              <el-option label="G" value="KeyG" />
-              <el-option label="H" value="KeyH" />
-              <el-option label="I" value="KeyI" />
-              <el-option label="G" value="KeyG" />
-              <el-option label="K" value="KeyK" />
-              <el-option label="L" value="KeyL" />
-              <el-option label="M" value="KeyM" />
-              <el-option label="N" value="KeyN" />
-              <el-option label="O" value="KeyO" />
-              <el-option label="P" value="KeyP" />
-              <el-option label="Q" value="KeyQ" />
-              <el-option label="R" value="KeyR" />
-              <el-option label="S" value="KeyS" />
-              <el-option label="T" value="KeyT" />
-              <el-option label="U" value="KeyU" />
-              <el-option label="V" value="KeyV" />
-              <el-option label="W" value="KeyW" />
-              <el-option label="X" value="KeyX" />
-              <el-option label="Y" value="KeyY" />
-              <el-option label="Z" value="KeyZ" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="1" value="Digit1" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="2" value="Digit2" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="3" value="Digit3" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="4" value="Digit4" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="5" value="Digit5" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="6" value="Digit6" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="7" value="Digit7" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="8" value="Digit8" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="9" value="Digit9" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="A" value="KeyA" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="B" value="KeyB" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="C" value="KeyC" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="D" value="KeyD" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="E" value="KeyE" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="F" value="KeyF" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="G" value="KeyG" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="H" value="KeyH" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="I" value="KeyI" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="G" value="KeyG" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="K" value="KeyK" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="L" value="KeyL" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="M" value="KeyM" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="N" value="KeyN" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="O" value="KeyO" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="P" value="KeyP" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="Q" value="KeyQ" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="R" value="KeyR" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="S" value="KeyS" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="T" value="KeyT" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="U" value="KeyU" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="V" value="KeyV" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="W" value="KeyW" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="X" value="KeyX" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="Y" value="KeyY" />
+              <el-option v-if="sizeForm.key1 == 'shift+control'" label="Z" value="KeyZ" />
+
             </el-select>
           </el-col>
         </el-row>
