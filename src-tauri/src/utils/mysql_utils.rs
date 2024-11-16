@@ -38,86 +38,89 @@ pub async fn init_mysql_pool(db_url: &str) {
 
     // 执行一个 SQL 查询，例如创建一个表
     let _ = sqlx::query("
-    create table if not exists 'cron_title' (
-    'id' TEXT NOT NULL,
-    'name' TEXT,
-    'content' TEXT,
-    'cron_type' TEXT DEFAULT 'interval',
-    'interval' INTEGER,
-    'appointed_time' INTEGER,
-    'is_use' INTEGER,
-    'pid' TEXT NOT NULL DEFAULT '0',
-    'category' TEXT NOT NULL,
-    'create_time' integer,
-    'creator_lid' TEXT,
-    'creator_name' TEXT,
-    'updater_lid' TEXT,
-    'updater_name' TEXT,
-    'up_ver' integer,
-    'sort' integer,
-    'tenant_id' integer,
-    'deleted' integer,
-    'update_time' integer,
-    'activity' interger NOT NULL DEFAULT 1,
-    PRIMARY KEY ('id')
-    );
+
+CREATE TABLE 'cron_title' (
+  'id' TEXT NOT NULL,
+  'name' TEXT,
+  'content' TEXT,
+  'cron_type' TEXT DEFAULT 'interval',
+  'interval' INTEGER,
+  'appointed_time' INTEGER,
+  'is_use' INTEGER,
+  'pid' TEXT NOT NULL DEFAULT '0',
+  'category' TEXT NOT NULL,
+  'create_time' integer,
+  'creator_lid' TEXT,
+  'creator_name' TEXT,
+  'updater_lid' TEXT,
+  'updater_name' TEXT,
+  'up_ver' integer,
+  'sort' integer,
+  'tenant_id' integer,
+  'deleted' integer,
+  'update_time' integer,
+  'activity' interger NOT NULL DEFAULT 1,
+  PRIMARY KEY ('id')
+);
 
 
 
-    create table if not exists 'grid_info' (
-    'id' TEXT NOT NULL,
-    'name' TEXT,
-    'describe' TEXT,
-    'uri' TEXT,
-    'code' TEXT,
-    'classify' TEXT,
-    'is_sys' integer DEFAULT 0,
-    'x' integer,
-    'y' integer,
-    'w' integer,
-    'h' integer,
-    'template_id' text,
-    'run_code' TEXT,
-    'create_time' integer,
-    'creator_lid' TEXT,
-    'creator_name' TEXT,
-    'updater_lid' TEXT,
-    'updater_name' TEXT,
-    'up_ver' integer,
-    'sort' integer,
-    'tenant_id' integer,
-    'deleted' integer,
-    'update_time' integer,
-    PRIMARY KEY ('id'),
-    CONSTRAINT 'only' UNIQUE ('code' COLLATE BINARY ASC) ON CONFLICT FAIL
-    );
+CREATE TABLE 'grid_info' (
+  'id' TEXT NOT NULL,
+  'name' TEXT,
+  'describe' TEXT,
+  'uri' TEXT,
+  'code' TEXT,
+  'classify' TEXT,
+  'is_sys' integer DEFAULT 0,
+  'x' integer,
+  'y' integer,
+  'w' integer,
+  'h' integer,
+  'template_id' text,
+  'run_code' TEXT,
+  'create_time' integer,
+  'creator_lid' TEXT,
+  'creator_name' TEXT,
+  'updater_lid' TEXT,
+  'updater_name' TEXT,
+  'up_ver' integer,
+  'sort' integer,
+  'tenant_id' integer,
+  'deleted' integer,
+  'update_time' integer,
+  PRIMARY KEY ('id'),
+  CONSTRAINT 'only' UNIQUE ('code' COLLATE BINARY ASC) ON CONFLICT FAIL
+);
+
+CREATE TABLE 'hot_key' (
+  'id' TEXT NOT NULL,
+  'key' TEXT NOT NULL,
+  'path' TEXT NOT NULL,
+  'desc' TEXT,
+  'overopen' integer,
+  'url' TEXT,
+  'shell' TEXT,
+  'create_time' integer,
+  'creator_lid' TEXT,
+  'creator_name' TEXT,
+  'updater_lid' TEXT,
+  'updater_name' TEXT,
+  'up_ver' integer,
+  'sort' integer,
+  'tenant_id' integer,
+  'deleted' integer,
+  'update_time' integer,
+  PRIMARY KEY ('id')
+);
 
 
-   create table if not exists 'hot_key' (
-    'id' TEXT NOT NULL,
-    'key' TEXT NOT NULL,
-    'path' TEXT NOT NULL,
-    'desc' TEXT,
-    'overopen' integer,
-    'url' TEXT,
-    'shell' TEXT,
-    'create_time' integer,
-    'creator_lid' TEXT,
-    'creator_name' TEXT,
-    'updater_lid' TEXT,
-    'updater_name' TEXT,
-    'up_ver' integer,
-    'sort' integer,
-    'tenant_id' integer,
-    'deleted' integer,
-    'update_time' integer,
-    PRIMARY KEY ('id')
-    );
 
 
-    INSERT INTO 'main'.'cron_title' ('id', 'name', 'content', 'cron_type', 'interval', 'appointed_time', 'is_use', 'pid', 'category', 'create_time', 'creator_lid', 'creator_name', 'updater_lid', 'updater_name', 'up_ver', 'sort', 'tenant_id', 'deleted', 'update_time') VALUES ('-1', '常规', '常规', 'interval', 1, 0, 0, '-2', 'type', 1713774603, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 1716454081);
-    INSERT INTO 'main'.'cron_title' ('id', 'name', 'content', 'cron_type', 'interval', 'appointed_time', 'is_use', 'pid', 'category', 'create_time', 'creator_lid', 'creator_name', 'updater_lid', 'updater_name', 'up_ver', 'sort', 'tenant_id', 'deleted', 'update_time') VALUES ('0', '默认', '默认', 'interval', 1, 0, 0, '-1', 'type', 1713774603, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 1716454328);
 
+
+INSERT INTO 'main'.'cron_title' ('id', 'name', 'content', 'cron_type', 'interval', 'appointed_time', 'is_use', 'pid', 'category', 'create_time', 'creator_lid', 'creator_name', 'updater_lid', 'updater_name', 'up_ver', 'sort', 'tenant_id', 'deleted', 'update_time', 'activity') VALUES ('-1', '常规', '常规', 'interval', 1, 0, 0, '-2', 'type', 1713774603, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 1729572009, 1);
+INSERT INTO 'main'.'cron_title' ('id', 'name', 'content', 'cron_type', 'interval', 'appointed_time', 'is_use', 'pid', 'category', 'create_time', 'creator_lid', 'creator_name', 'updater_lid', 'updater_name', 'up_ver', 'sort', 'tenant_id', 'deleted', 'update_time', 'activity') VALUES ('0', '默认', '默认', 'interval', 1, 0, 0, '-1', 'type', 1713774603, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0, 1725853834, 1);
 
 
 
