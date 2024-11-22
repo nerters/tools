@@ -50,11 +50,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { invoke } from '@tauri-apps/api/core';
 const appWindow = getCurrentWindow();
 
 const title = ref("")
-const cronId = ref("")
 const keys = ref<Array<{
   key: string,
   time: number
@@ -129,11 +127,6 @@ setInterval(() => {
 
 }, keys.value.length == 0 ? 1000: 0);
 
-async function close() {
-    appWindow.close()
-    await invoke("use_cron", {id: cronId.value});
-    //appWindow.emit("ref_cron_list", true);
-}
 
 
 </script>
