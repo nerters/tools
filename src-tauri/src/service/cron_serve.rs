@@ -4,6 +4,8 @@ use tauri::{Emitter, Manager};
 
 use crate::{dao::cron::{self, alert_win, delete_by_id, save, update_tokio, update_use_tokio, CronInfo, CRON_MAP}, utils::date_util::get_now_time_m};
 
+use super::other_serve::keyboard_light;
+
 #[tauri::command]
 pub async fn savn_cron(
     name: String,
@@ -88,7 +90,7 @@ pub async fn del_cron(id: String) {
 #[tauri::command]
 pub async fn open_docs(handle: tauri::AppHandle) {
     alert_win(handle.clone()).await;
-
+    keyboard_light(handle.clone());
     //floating_window(handle.clone()).await;
 }
 

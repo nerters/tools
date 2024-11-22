@@ -114,6 +114,15 @@ const routes: Array<RouteRecordRaw> = [
         },
         {
           //路由初始指向
+            path: 'KeyDown',
+            name: 'KeyDown',
+            meta: {
+              title: 'KeyDown'
+            },
+            component:()=>import('../hint/KeyDown.vue')
+        },
+        {
+          //路由初始指向
             path: 'CountDown',
             name: 'CountDown',
             meta: {

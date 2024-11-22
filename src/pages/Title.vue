@@ -165,6 +165,7 @@
                   <el-button  style="width: 100%;" text @click="addGrid">新建</el-button>
                   <el-button  style="width: 100%; margin-left: 0px;" text @click="editGrid" v-if="editGridData">固定</el-button>
                   <el-button  style="width: 100%; margin-left: 0px;" text @click="editGrid" v-if="!editGridData">编辑</el-button>
+                  <el-button  style="width: 100%; margin-left: 0px;" text >炫酷键盘</el-button>
                 </el-scrollbar>
 
                 <el-scrollbar max-height="400px" v-if="props.type === 'json'">

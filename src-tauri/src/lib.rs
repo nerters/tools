@@ -28,7 +28,7 @@ async fn init() {
     ALLAMA
     .set(Ollama::new("http://localhost".to_string(), 11434))
     .unwrap_or_else(|_| println!("try insert pool cell failure!"));
-
+    
 }
 
 fn show_window(app: &AppHandle) {
