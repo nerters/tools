@@ -13,7 +13,7 @@ use std::{
 use tauri::{async_runtime::spawn, Manager, PhysicalPosition};
 use tokio::sync::Mutex;
 
-use crate::{utils::{date_util::get_now_time_m, mysql_utils::get_connect}, PHYSIZE};
+use crate::{utils::{date_util::get_now_time_m, mysql_utils::get_connect}, PHYSIZE, SCALE_FACTOR};
 
 static THREAD_STARTED: AtomicBool = AtomicBool::new(false);
 
@@ -411,8 +411,10 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
         }
         
         let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-        let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
-        let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
+        let mut width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
+        let mut height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
+        width = width / unsafe { SCALE_FACTOR };
+        height = height / unsafe { SCALE_FACTOR };
 
         let position_x = 0.0;
         let mut position_y = height / 2.0 + (win_num as f64) * 100.0;

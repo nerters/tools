@@ -17,6 +17,7 @@ mod hotKey;
 
 pub static ALLAMA: OnceCell<Ollama> = OnceCell::new();
 pub static PHYSIZE: OnceCell<HashMap<String, u32>> = OnceCell::new();
+pub static mut SCALE_FACTOR : f64 = 0.0;
 
 
 
@@ -62,12 +63,16 @@ pub fn run() {
 
             // 获取主窗口所在的屏幕
             if let Some(monitor) = mainwindow.primary_monitor().unwrap() {
+                
                 let size = monitor.size();
                 let width = size.width;
                 let height = size.height;
+                unsafe { SCALE_FACTOR = monitor.scale_factor() };
                 let mut map: HashMap<String, u32> = HashMap::new();
                 map.insert(String::from("width"), width);
                 map.insert(String::from("height"), height);
+
+                println!("scale_factor: {}", monitor.scale_factor());
 
                 PHYSIZE
                 .set(map)

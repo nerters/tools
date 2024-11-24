@@ -121,6 +121,9 @@ setInterval(() => {
       if (now - keys.value[i].time > 3000) {
         console.log('刪除')
         keys.value.splice(i, 1);
+        if (i == 0) {
+          appWindow.hide();
+        }
       }
     }
   }

@@ -10,7 +10,7 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use tauri_plugin_shell::ShellExt;
 use tokio::sync::Mutex;
 
-use crate::{dao::hot_key::{self, HotKey}, ALLAMA, PHYSIZE};
+use crate::{dao::hot_key::{self, HotKey}, ALLAMA, PHYSIZE, SCALE_FACTOR};
 
 lazy_static! {
     pub static ref CRON_MAP: Arc<Mutex<Vec<String>>> =
@@ -265,8 +265,10 @@ pub fn open_web<R: Runtime>(app: &tauri::AppHandle<R>, path: String, overopen: b
     let w = 800.0;
     let h = 600.0;
     let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-    let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
-    let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
+    let mut width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as f64;
+    let mut height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as f64;
+    width = width / unsafe { SCALE_FACTOR };
+    height = height / unsafe { SCALE_FACTOR };
 
     let mut position_x = width / 2.0 - w / 2.0;
     let mut position_y = height / 2.0 - h / 2.0;
