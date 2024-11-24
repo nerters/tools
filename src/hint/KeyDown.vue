@@ -123,7 +123,7 @@ function randomColor() {
     }
 
 // 每秒更新一次时间戳
-setPromiseInterval(() => {
+setPromiseInterval(async () => {
   if (keys.value.length == 0) {
     appWindow.setSize(new LogicalSize(0 ,60));
     appWindow.hide();
