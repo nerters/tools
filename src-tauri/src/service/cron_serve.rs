@@ -90,7 +90,6 @@ pub async fn del_cron(id: String) {
 #[tauri::command]
 pub async fn open_docs(handle: tauri::AppHandle) {
     alert_win(handle.clone()).await;
-    keyboard_light(handle.clone());
     //floating_window(handle.clone()).await;
 }
 

@@ -49,10 +49,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { getCurrentWindow } from '@tauri-apps/api/window';
+import { getCurrentWindow, LogicalPosition, LogicalSize } from '@tauri-apps/api/window';
 const appWindow = getCurrentWindow();
 
 const title = ref("")
+const width = ref(0)
+const height = ref(0)
+const factor = ref(0.0)
 const keys = ref<Array<{
   key: string,
   time: number
@@ -64,8 +67,17 @@ onMounted(async () => {
   title.value = await appWindow.title();
   title.value = title.value.replace(/\n/g, '<br/>')
   await getCurrentWindow().listen<any>("key_down_msg", (event) => {
-        let temp = event.payload;
+        let data = event.payload;
+        let temp = data.key;
+        console.log(data.width);
         console.log(temp);
+        width.value = data.width / data.factor;
+        console.log(width.value);
+        height.value =  data.height / data.factor;
+        factor.value = data.factor;
+        console.log("----------" + ((width.value / 2) - keys.value.length * 35))
+        appWindow.setSize(new LogicalSize((keys.value.length + 1) * 70 + 10  ,60));
+        appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length + 1) * 35 - 5, height.value - 60 * 2));
         if (temp.includes("Key")) {
           temp = temp.replace("Key", "");
         }
@@ -93,6 +105,7 @@ onMounted(async () => {
         if (keys.value.length == 0) {
           appWindow.show();
         }
+
         keys.value.push({
           key: temp,
           time: Date.now()
@@ -110,6 +123,7 @@ function randomColor() {
 
 // 每秒更新一次时间戳
 setInterval(() => {
+
   console.log("數量：" + keys.value.length);
   if (keys.value.length == 0) {
     appWindow.hide();
@@ -122,7 +136,11 @@ setInterval(() => {
         console.log('刪除')
         keys.value.splice(i, 1);
         if (keys.value.length == 0) {
+          appWindow.setSize(new LogicalSize(0 ,60));
           appWindow.hide();
+        } else {
+          appWindow.setSize(new LogicalSize((keys.value.length + 1) * 70 + 10 ,60));
+          appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length + 1) * 35 - 5, height.value - 60 * 2));
         }
       }
     }

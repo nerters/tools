@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-
 use ollama_rs::Ollama;
 use tauri::{AppHandle, Manager};
 use once_cell::sync::OnceCell;
@@ -151,7 +150,11 @@ pub fn run() {
             service::hot_key_serve::get_hot_key_list,
             service::hot_key_serve::add_hot_key,
             service::hot_key_serve::update_hot_key,
-            service::hot_key_serve::delete_hot_key
+            service::hot_key_serve::delete_hot_key,
+
+            service::other_serve::keyboard_light,
+            service::other_serve::check_keyboard,
+            service::other_serve::colse_win,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

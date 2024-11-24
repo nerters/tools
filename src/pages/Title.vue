@@ -4,10 +4,12 @@
     import clo from "../assets/mdi_close.svg";
     import max from "../assets/mdi_maximize.svg";
     import min from "../assets/mdi_minimize.svg";
+    import { invoke } from '@tauri-apps/api/core';
     import { getCurrentWindow } from '@tauri-apps/api/window';
     import { useRouter } from "vue-router";
     const appWindow = getCurrentWindow();
     const router = useRouter();
+    const keyboard = ref(false);
 
     const emit = defineEmits(["addGrid", "editGrid"])
 
@@ -134,6 +136,20 @@
         val ? document.addEventListener('mousedown', onbourfun) : document.removeEventListener('mousedown', onbourfun) }
     )
 
+    async function setUp() {
+      setShow.value = true;
+      keyboard.value = await invoke("check_keyboard");
+    }
+
+
+    async function cocleKey() {
+      await invoke("keyboard_light");
+    }
+
+    async function colseKey() {
+      await invoke("colse_win", {winKey: 'msg-keyboard'});
+    }
+
 
 
 </script>
@@ -150,7 +166,7 @@
             <el-popover class="needHide-Container" placement="bottom" :width="100" trigger="click" :visible="setShow">
               <template #reference>
                 <div v-if="props.type === 'grid' || props.type === 'json'">
-                  <el-button  type="" key="plain"  text @click="setShow = true" >设置</el-button>
+                  <el-button  type="" key="plain"  text @click="setUp" >设置</el-button>
                 </div>
 
                 <div v-if="props.type === 'read'">
@@ -165,7 +181,8 @@
                   <el-button  style="width: 100%;" text @click="addGrid">新建</el-button>
                   <el-button  style="width: 100%; margin-left: 0px;" text @click="editGrid" v-if="editGridData">固定</el-button>
                   <el-button  style="width: 100%; margin-left: 0px;" text @click="editGrid" v-if="!editGridData">编辑</el-button>
-                  <el-button  style="width: 100%; margin-left: 0px;" text >炫酷键盘</el-button>
+                  <el-button  style="width: 100%; margin-left: 0px;" text @click="cocleKey" v-if="!keyboard">打开炫酷键盘</el-button>
+                  <el-button  style="width: 100%; margin-left: 0px;" text @click="colseKey" v-if="keyboard">关闭炫酷键盘</el-button>
                 </el-scrollbar>
 
                 <el-scrollbar max-height="400px" v-if="props.type === 'json'">
