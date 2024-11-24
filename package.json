@@ -26,6 +26,7 @@
     "codemirror": "^6.0.1",
     "element-plus": "^2.6.3",
     "jsencrypt": "^3.3.2",
+    "set-promise-interval": "^1.0.8",
     "vue": "^3.3.4",
     "vue-codemirror6": "^1.2.5",
     "vue-grid-layout": "^3.0.0-beta1",

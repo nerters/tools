@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { getCurrentWindow, LogicalPosition, LogicalSize } from '@tauri-apps/api/window';
+import setPromiseInterval from 'set-promise-interval'
 const appWindow = getCurrentWindow();
 
 const title = ref("")
@@ -122,27 +123,27 @@ function randomColor() {
     }
 
 // 每秒更新一次时间戳
-setInterval(() => {
-
-  console.log("數量：" + keys.value.length);
+setPromiseInterval(() => {
   if (keys.value.length == 0) {
+    appWindow.setSize(new LogicalSize(0 ,60));
     appWindow.hide();
   } else {
     const now = Date.now();
     for (let i = 0; i < keys.value.length; i++) {
       console.log(keys.value[i].time)
       console.log(now)
-      if (now - keys.value[i].time > 3000) {
-        console.log('刪除')
+      if (now - keys.value[i].time > 6000) {
+        console.log('刪除' + keys.value.length)
         keys.value.splice(i, 1);
         if (keys.value.length == 0) {
           appWindow.setSize(new LogicalSize(0 ,60));
           appWindow.hide();
         } else {
-          appWindow.setSize(new LogicalSize((keys.value.length + 1) * 70 + 10 ,60));
-          appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length + 1) * 35 - 5, height.value - 60 * 2));
+          appWindow.setSize(new LogicalSize((keys.value.length) * 70 + 10 ,60));
+          appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length) * 35 - 5, height.value - 60 * 2));
         }
       }
+      
     }
   }
 
