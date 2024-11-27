@@ -73,16 +73,20 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                                     let mut height =  1;
                                     let mut factor = 1.0;
                                     // 获取主窗口所在的屏幕
-                                    if let Some(monitor) = win.primary_monitor().unwrap() {
-                                        
-                                        let size = monitor.size();
-                                        width = size.width;
-                                        height = size.height;
-                                        factor = monitor.scale_factor();
-                                        println!("Screen resolution: {}x{}", width, height);
-                                    } else {
-                                        println!("Could not get monitor information");
-                                    }
+                                    let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
+                                   width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as i32;
+                                   height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as i32;
+                                   
+                                    //if let Some(monitor) = win.primary_monitor().unwrap() {
+                                    //    
+                                    //    let size = monitor.size();
+                                    //    width = size.width;
+                                    //    height = size.height;
+                                    //    factor = monitor.scale_factor();
+                                    //    println!("Screen resolution: {}x{}", width, height);
+                                    //} else {
+                                    //    println!("Could not get monitor information");
+                                    //}
                                     
                                     // KEY
                                     // .set(evet.clone())
@@ -92,7 +96,7 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                                     map.insert("key", key.clone());
                                     map.insert("width", width.to_string());
                                     map.insert("height", height.to_string());
-                                    map.insert("factor", factor.to_string());
+                                    map.insert("factor", SCALE_FACTOR.to_string());
                                     win.emit("key_down_msg", map).unwrap();
                                     return ;
                                 },

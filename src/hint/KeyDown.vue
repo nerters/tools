@@ -62,6 +62,8 @@ const keys = ref<Array<{
   time: number
 }>>([]);
 
+const keyMap = new Map();
+
 
 
 onMounted(async () => { 
@@ -101,16 +103,24 @@ onMounted(async () => {
         if (temp.includes("Escape")) {
           temp = 'esc';
         }
-        
 
-        if (keys.value.length == 0) {
-          appWindow.show();
+        let val = keyMap.get(temp);
+        if ((Date.now() - val) < 300) {
+          keyMap.set(temp, Date.now());
+          return;
+        } else {
+          keyMap.set(temp, Date.now());
+
+          if (keys.value.length == 0) {
+            appWindow.show();
+          }
+
+          keys.value.push({
+            key: temp,
+            time: Date.now()
+          })
         }
 
-        keys.value.push({
-          key: temp,
-          time: Date.now()
-        })
     });
 })
 
@@ -132,7 +142,7 @@ setPromiseInterval(async () => {
     for (let i = 0; i < keys.value.length; i++) {
       console.log(keys.value[i].time)
       console.log(now)
-      if (now - keys.value[i].time > 6000) {
+      if (now - keys.value[i].time > 3000) {
         console.log('刪除' + keys.value.length)
         keys.value.splice(i, 1);
         if (keys.value.length == 0) {
