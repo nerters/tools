@@ -43,6 +43,7 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
         .decorations(false)
         .transparent(true)
         .resizable(false)
+        .skip_taskbar(true)
         .position(0.0, height - 120.0)
         .build();
 
@@ -72,6 +73,9 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                             match evet.event_type {
                                 rdev::EventType::KeyPress(key) => {
                                     let key = format!("{:?}", key);
+                                    if "Unknown(255)".eq(&key) {
+                                        return;
+                                    }
                                     let mut width = 1;
                                     let mut height =  1;
                                     let mut factor = 1.0;

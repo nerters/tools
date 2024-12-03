@@ -15,6 +15,7 @@
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/merge": "^6.6.1",
     "@codemirror/state": "^6.4.1",
+    "@fortawesome/fontawesome-free": "^6.7.1",
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-autostart": "^2.0.0-rc.1",
     "@tauri-apps/plugin-clipboard-manager": "^2.0.0-rc.1",

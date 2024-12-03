@@ -4,6 +4,7 @@ import 'element-plus/dist/index.css'
 
 import router from './router'
 import App from './App.vue'
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import VueGridLayout from 'vue-grid-layout'
 

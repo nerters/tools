@@ -223,6 +223,7 @@ pub async fn floating_window(handle: tauri::AppHandle, id: String) {
         .decorations(false)
         .transparent(true)
         .resizable(false)
+        .skip_taskbar(true)
         .position(800.0, 100.0 + (win_num as f64) * 100.0)
         .build();
 
