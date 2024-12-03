@@ -18,6 +18,7 @@
   flex-wrap: wrap;           /* 自动换行 */
   gap: 10px;                 /* 键帽之间的间距 */
   justify-content: center;   /* 居中对齐 */
+  overflow-y: hidden; /* 启用垂直滚动条 */
 
 }
 
@@ -72,15 +73,7 @@ onMounted(async () => {
   await getCurrentWindow().listen<any>("key_down_msg", (event) => {
         let data = event.payload;
         let temp = data.key;
-        console.log(data.width);
-        console.log(temp);
-        width.value = data.width / data.factor;
-        console.log(width.value);
-        height.value =  data.height / data.factor;
-        factor.value = data.factor;
-        console.log("----------" + ((width.value / 2) - keys.value.length * 35))
-        appWindow.setSize(new LogicalSize((keys.value.length + 1) * 70 + 10  ,60));
-        appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length + 1) * 35 - 5, height.value - 60 * 2));
+
         if (temp.includes("Key")) {
           temp = temp.replace("Key", "");
         }
@@ -109,16 +102,21 @@ onMounted(async () => {
           keyMap.set(temp, Date.now());
           return;
         } else {
-          keyMap.set(temp, Date.now());
+          width.value = data.width / data.factor;
+          height.value =  data.height / data.factor;
+          factor.value = data.factor;
+         
 
-          if (keys.value.length == 0) {
-            appWindow.show();
-          }
+            if (keys.value.length == 0) {
+              appWindow.show();
+            }
+            keyMap.set(temp, Date.now());
+            keys.value.push({
+              key: temp,
+              time: Date.now()
+            })
+            setWindowSize(0);
 
-          keys.value.push({
-            key: temp,
-            time: Date.now()
-          })
         }
 
     });
@@ -149,8 +147,7 @@ setPromiseInterval(async () => {
           appWindow.setSize(new LogicalSize(0 ,60));
           appWindow.hide();
         } else {
-          appWindow.setSize(new LogicalSize((keys.value.length) * 70 + 10 ,60));
-          appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length) * 35 - 5, height.value - 60 * 2));
+          setWindowSize(0);
         }
       }
       
@@ -158,6 +155,12 @@ setPromiseInterval(async () => {
   }
 
 }, keys.value.length == 0 ? 1000: 0);
+
+
+function setWindowSize(num: number) {
+  appWindow.setSize(new LogicalSize((keys.value.length + num) * 70 + 10 ,60));
+  appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length + num) * 35 - 5, height.value - 60 * 2));
+}
 
 
 

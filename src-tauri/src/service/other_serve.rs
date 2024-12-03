@@ -57,6 +57,9 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                         println!("键盘监听!");
                         KEY_LISTEN = true;
                         if let Err(error) = listen(move |evet| {
+                            if !KEYBOARD {
+                                return;
+                            }
                             let key_check = KEY.get();
                             match key_check {
                                 Some(key_check) => {
@@ -76,21 +79,6 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                                     let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
                                    width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as i32;
                                    height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as i32;
-                                   
-                                    //if let Some(monitor) = win.primary_monitor().unwrap() {
-                                    //    
-                                    //    let size = monitor.size();
-                                    //    width = size.width;
-                                    //    height = size.height;
-                                    //    factor = monitor.scale_factor();
-                                    //    println!("Screen resolution: {}x{}", width, height);
-                                    //} else {
-                                    //    println!("Could not get monitor information");
-                                    //}
-                                    
-                                    // KEY
-                                    // .set(evet.clone())
-                                    // .unwrap_or_else(|_| println!("try insert pool cell failure!"));
                                     println!("按下{}", key.clone());
                                     let mut map = HashMap::new();
                                     map.insert("key", key.clone());
@@ -98,7 +86,6 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                                     map.insert("height", height.to_string());
                                     map.insert("factor", SCALE_FACTOR.to_string());
                                     win.emit("key_down_msg", map).unwrap();
-                                    return ;
                                 },
                                 rdev::EventType::KeyRelease(key) => {
                                     println!("释放{:?}", key);

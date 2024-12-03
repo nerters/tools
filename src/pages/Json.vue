@@ -222,7 +222,7 @@
   </div>
 
 
-  <div class="merge" v-show="editorToMerge" ref="mergeRef"  style="height: 100%;">
+  <div class="merge" v-show="editorToMerge" ref="mergeRef"  style="height: 100%; overflow-y: auto;">
 
   </div>
 </template>
@@ -232,6 +232,7 @@
 .main {
   width: 100%;
   height: 100%;
+  overflow-y: auto; /* 启用垂直滚动条 */
 }
 /* required! */
 .cm-editor {
