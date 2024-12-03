@@ -39,18 +39,19 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
             tauri::WebviewUrl::App("/hint/KeyDown".parse().unwrap()),
         )
         .title("键盘监听事件")
-        .inner_size(width, 60.0)
+        .inner_size(0.0, 60.0)
         .decorations(false)
         .transparent(true)
         .resizable(false)
         .skip_taskbar(true)
         .position(0.0, height - 120.0)
+        .focused(false)
+        .always_on_top(true)
         .build();
 
         match docs_window {
             Ok(win) => {
                 println!("键盘监听窗口启动成功!");
-                let _ = win.set_always_on_top(true);
                 let _ = win.hide();
                 unsafe {
                     KEYBOARD = true;

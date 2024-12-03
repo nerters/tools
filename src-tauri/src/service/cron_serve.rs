@@ -224,12 +224,14 @@ pub async fn floating_window(handle: tauri::AppHandle, id: String) {
         .transparent(true)
         .resizable(false)
         .skip_taskbar(true)
+        .focused(false)
+        .always_on_top(true)
         .position(800.0, 100.0 + (win_num as f64) * 100.0)
         .build();
 
         match docs_window {
             Ok(win) => {
-                let _ = win.set_always_on_top(true);
+
             }
             Err(_) => {
                 println!("启动窗口失败!");
