@@ -51,7 +51,7 @@ onMounted(async () => {
         key: temp,
         time: Date.now(),
       });
-      setWindowSize(0);
+      setWindowSize();
     }
   });
 });
@@ -166,7 +166,7 @@ const getIconClass = (key: string): string => {
 
 
 // 设置窗口大小
-function setWindowSize(num: number) {
+function setWindowSize() {
   appWindow.setSize(new LogicalSize((keys.value.length) * 70 + 10 ,60));
   appWindow.setPosition(new LogicalPosition((width.value / 2) - (keys.value.length) * 35 - 5, height.value - 60 * 2));
 }
@@ -195,7 +195,7 @@ setPromiseInterval(async () => {
           appWindow.setSize(new LogicalSize(0 ,60));
           appWindow.hide();
         } else {
-          setWindowSize(0);
+          setWindowSize();
         }
       }
     }
