@@ -44,9 +44,9 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
         .transparent(true)
         .resizable(false)
         .skip_taskbar(true)
-        .position(0.0, height - 120.0)
         .focused(false)
         .always_on_top(true)
+        .position(0.0, height - 120.0)
         .build();
 
         match docs_window {

@@ -433,6 +433,9 @@ async fn new_win(handle: tauri::AppHandle, cron: CronInfo) {
         .decorations(false)
         .transparent(true)
         .resizable(false)
+        .skip_taskbar(true)
+        .focused(false)
+        .always_on_top(true)
         .position(position_x, position_y)
         .build();
         println!("Screen resolution: {}x{}", width, height);
