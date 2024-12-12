@@ -3,7 +3,7 @@ use std::sync::Arc;
 use idgen::IDGen;
 use lazy_static::lazy_static;
 use ollama_rs::{generation::completion::request::GenerationRequest, Ollama};
-use tauri::{async_runtime::spawn, utils::config::Position, Manager, PhysicalPosition, Runtime};
+use tauri::{async_runtime::spawn, Manager, PhysicalPosition, Runtime};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use tauri_plugin_global_shortcut::ShortcutState;
@@ -24,48 +24,13 @@ pub fn create_host_key<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<(
         println!("成功");
     } else {
         println!("失败");
-    }  
+    }
+    let list = hot_key::get_list();
+    let strs: Vec<&str> = list.iter().map(|ele| ele.key.as_str()).collect();
 
     match app.plugin(
         tauri_plugin_global_shortcut::Builder::new()
-            .with_shortcuts([
-                "shift+control+Digit1",
-                "shift+control+Digit2",
-                "shift+control+Digit3",
-                "shift+control+Digit4",
-                "shift+control+Digit5",
-                "shift+control+Digit6",
-                "shift+control+Digit7",
-                "shift+control+Digit8",
-                "shift+control+Digit9",
-                "shift+control+Digit0",
-                "shift+control+KeyA",
-                "shift+control+KeyB",
-                "shift+control+KeyC",
-                "shift+control+KeyD",
-                "shift+control+KeyE",
-                "shift+control+KeyF",
-                "shift+control+KeyG",
-                "shift+control+KeyH",
-                "shift+control+KeyI",
-                "shift+control+KeyJ",
-                "shift+control+KeyK",
-                "shift+control+KeyL",
-                "shift+control+KeyM",
-                "shift+control+KeyN",
-                "shift+control+KeyO",
-                "shift+control+KeyP",
-                "shift+control+KeyQ",
-                "shift+control+KeyR",
-                "shift+control+KeyS",
-                "shift+control+KeyT",
-                "shift+control+KeyU",
-                "shift+control+KeyV",
-                "shift+control+KeyW",
-                "shift+control+KeyY",
-
-
-            ]).unwrap()
+        .with_shortcuts(strs).unwrap()
             .with_handler(move |app, shortcut: &tauri_plugin_global_shortcut::Shortcut, event| {
                 println!("{}", shortcut.into_string());
 

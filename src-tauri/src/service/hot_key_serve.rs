@@ -1,6 +1,6 @@
 use idgen::IDGen;
 
-use crate::{dao::hot_key::{self, HotKey}, hotKey};
+use crate::dao::hot_key::{self, HotKey};
 
 #[tauri::command]
 pub fn get_hot_key_list() -> Vec<HotKey> {
@@ -9,7 +9,7 @@ pub fn get_hot_key_list() -> Vec<HotKey> {
 }
 
 #[tauri::command]
-pub fn add_hot_key(handle: tauri::AppHandle, key: String, path: String, desc: String, overopen: i64, url: String, shell: String) {
+pub fn add_hot_key(_handle: tauri::AppHandle, key: String, path: String, desc: String, overopen: i64, url: String, shell: String) {
     let mut info = HotKey::default();
     let idgen = IDGen::new(1);
     let id = idgen.new_id();
