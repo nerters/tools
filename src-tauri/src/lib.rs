@@ -154,7 +154,7 @@ pub fn run() {
 
             service::other_serve::keyboard_light,
             service::other_serve::check_keyboard,
-            service::other_serve::colse_win,
+            service::other_serve::close_win,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
