@@ -137,6 +137,7 @@
     )
 
     async function setUp() {
+      console.log(12341234)
       setShow.value = true;
       keyboard.value = await invoke("check_keyboard");
     }
@@ -147,7 +148,7 @@
     }
 
     async function colseKey() {
-      await invoke("colse_win", {winKey: 'msg-keyboard'});
+      await invoke("close_win", {winKey: 'msg-keyboard'});
     }
 
 

@@ -60,32 +60,32 @@ onMounted(async () => {
 const getIconClass = (key: string): string => {
   switch (key) {
     // 字母键
-    case 'KeyA': return 'fas fa-a'; 
-    case 'KeyB': return 'fas fa-b'; 
-    case 'KeyC': return 'fas fa-c'; 
-    case 'KeyD': return 'fas fa-d'; 
-    case 'KeyE': return 'fas fa-e'; 
-    case 'KeyF': return 'fas fa-f'; 
-    case 'KeyG': return 'fas fa-g'; 
-    case 'KeyH': return 'fas fa-h'; 
-    case 'KeyI': return 'fas fa-i'; 
-    case 'KeyJ': return 'fas fa-j'; 
-    case 'KeyK': return 'fas fa-k'; 
-    case 'KeyL': return 'fas fa-l'; 
-    case 'KeyM': return 'fas fa-m'; 
-    case 'KeyN': return 'fas fa-n'; 
-    case 'KeyO': return 'fas fa-o'; 
-    case 'KeyP': return 'fas fa-p'; 
-    case 'KeyQ': return 'fas fa-q'; 
-    case 'KeyR': return 'fas fa-r'; 
-    case 'KeyS': return 'fas fa-s'; 
-    case 'KeyT': return 'fas fa-t'; 
-    case 'KeyU': return 'fas fa-u'; 
-    case 'KeyV': return 'fas fa-v'; 
-    case 'KeyW': return 'fas fa-w'; 
-    case 'KeyX': return 'fas fa-x'; 
-    case 'KeyY': return 'fas fa-y'; 
-    case 'KeyZ': return 'fas fa-z'; 
+    case 'A': return 'fas fa-a'; 
+    case 'B': return 'fas fa-b'; 
+    case 'C': return 'fas fa-c'; 
+    case 'D': return 'fas fa-d'; 
+    case 'E': return 'fas fa-e'; 
+    case 'F': return 'fas fa-f'; 
+    case 'G': return 'fas fa-g'; 
+    case 'H': return 'fas fa-h'; 
+    case 'I': return 'fas fa-i'; 
+    case 'J': return 'fas fa-j'; 
+    case 'K': return 'fas fa-k'; 
+    case 'L': return 'fas fa-l'; 
+    case 'M': return 'fas fa-m'; 
+    case 'N': return 'fas fa-n'; 
+    case 'O': return 'fas fa-o'; 
+    case 'P': return 'fas fa-p'; 
+    case 'Q': return 'fas fa-q'; 
+    case 'R': return 'fas fa-r'; 
+    case 'S': return 'fas fa-s'; 
+    case 'T': return 'fas fa-t'; 
+    case 'U': return 'fas fa-u'; 
+    case 'V': return 'fas fa-v'; 
+    case 'W': return 'fas fa-w'; 
+    case 'X': return 'fas fa-x'; 
+    case 'Y': return 'fas fa-y'; 
+    case 'Z': return 'fas fa-z'; 
 
     // 数字键
     case 'Num1': return 'fas fa-1'; 
