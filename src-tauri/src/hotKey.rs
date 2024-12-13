@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use idgen::IDGen;
 use lazy_static::lazy_static;
-use ollama_rs::{generation::completion::request::GenerationRequest, Ollama};
+use ollama_rs::generation::completion::request::GenerationRequest;
 use tauri::{async_runtime::spawn, Manager, PhysicalPosition, Runtime};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
@@ -358,27 +358,4 @@ async fn open_msg<R: Runtime>(handle: &tauri::AppHandle<R>, msg: String) {
             }
         }
     }
-}
-
-#[test]
-fn test1() {
-    test()
-}
-
-#[tokio::main]
-async fn test() {
-    // For custom values:
-    let ollama = Ollama::new("http://localhost".to_string(), 11434);
-    let model = "llama3.2".to_string();
-    let prompt = "Why is the sky blue?".to_string();
-
-
-    let res = ollama.generate(GenerationRequest::new(model, prompt)).await;
-
-    if let Ok(res) = res {
-        let msg = res.response.to_string();
-       
-        println!("{}", res.response);
-    }
- 
 }
