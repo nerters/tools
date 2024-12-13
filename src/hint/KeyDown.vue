@@ -134,10 +134,10 @@ const getIconClass = (key: string): string => {
     case 'Space': return 'fas fa-space-shuttle'; // 空格键可以使用一个特别的图标
 
     // 箭头键
-    case 'UpArrow': return 'fas fa-arrow-up'; 
-    case 'DownArrow': return 'fas fa-arrow-down'; 
-    case 'LeftArrow': return 'fas fa-arrow-left'; 
-    case 'RightArrow': return 'fas fa-arrow-right'; 
+    case 'ArrowUp': return 'fas fa-arrow-up'; 
+    case 'ArrowDown': return 'fas fa-arrow-down'; 
+    case 'ArrowLeft': return 'fas fa-arrow-left'; 
+    case 'ArrowRight': return 'fas fa-arrow-right'; 
     //page  PageDown  PageUp
     case 'PageUp': return 'fas fa-arrow-up'; 
     case 'PageDown': return 'fas fa-arrow-down'; 
