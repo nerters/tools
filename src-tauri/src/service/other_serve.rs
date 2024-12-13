@@ -59,20 +59,24 @@ pub async fn keyboard_light(handle: tauri::AppHandle) {
                 println!("键盘监听!");
 
                 start_listen(move |event| {
-                    println!("Keyboard event: {:?}", event.key);
-                    let key = event.key.to_string();
-                    let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
-                    let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as i32;
-                    let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as i32;
-                    println!("按下{}", key);
-                    let mut map = HashMap::new();
-                    map.insert("key", key.clone());
-                    map.insert("width", width.to_string());
-                    map.insert("height", height.to_string());
-                    map.insert("factor", factor.to_string());
-                    // 异步更新窗口信息
-                    if let Err(e) = win.emit("key_down_msg", map) {
-                        println!("Emit error: {}", e);
+                    println!("Keyboard event: {:?}", event);
+                    if "Unknown".eq(event.key) {
+                        
+                    } else {
+                        let key = event.key.to_string();
+                        let physize = PHYSIZE.get().expect("Error get pool from OneCell<Pool>");
+                        let width = physize.get("width").unwrap_or(&(1920 as u32)).clone() as i32;
+                        let height = physize.get("height").unwrap_or(&(1080 as u32)).clone() as i32;
+                        println!("按下{}", key);
+                        let mut map = HashMap::new();
+                        map.insert("key", key.clone());
+                        map.insert("width", width.to_string());
+                        map.insert("height", height.to_string());
+                        map.insert("factor", factor.to_string());
+                        // 异步更新窗口信息
+                        if let Err(e) = win.emit("key_down_msg", map) {
+                            println!("Emit error: {}", e);
+                        }
                     }
                 });
             }
